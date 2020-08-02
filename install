@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
-MAC_PACKAGES="emacs main node ruby tmux vim zsh"
-SERVER_PACKAGES="bash main screen tmux vim"
+# WORKSTATION_PACKAGES="emacs main node ruby tmux vim zsh" ## TODO: Fix and uncomment all of these
+# SERVER_PACKAGES="bash main screen tmux vim" ## TODO: Fix and uncomment all of these
+WORKSTATION_PACKAGES="bash main tmux zsh_arch"
+SERVER_PACKAGES="bash main tmux"
 
 STOW_DIR=`dirname $0`
 
 pushd $STOW_DIR > /dev/null
 
 case $1 in
-  mac)
-    for package in $MAC_PACKAGES; do
+  mac|linux)
+    for package in $WORKSTATION_PACKAGES; do
       stow -R $package &> /dev/null
     done
     ;;

@@ -1,55 +1,53 @@
-[color]
-  diff = auto
-  status = auto
-  branch = auto
-  ui = auto
-[push]
-  default = upstream
-[alias]
-  aa = add -A
-  d = diff -b
-  dc = diff --cached -b
-  marked-unchanged = !git ls-files -v | grep ^[a-z]
-  mu = !git ls-files -v | grep ^[a-z]
-  dm = !git branch --merged | egrep -v \"(^\\*|master|dev)\" | xargs git branch -d
-  br = branch
-  ba = branch -a
-  brm = merge --no-ff --log --no-commit
-  pr = remote prune
-  pro = remote prune origin
-  st = status
-  co = checkout
-  oc = checkout
-  sub = submodule
-  subrm = submodule deinit
-  l = log --graph --decorate --oneline
-  ls = log --graph --decorate --oneline --stat
-  la = log --graph --decorate --oneline --all
-  lsa = log --graph --decorate --oneline --stat --all
-  rmerge = merge --no-ff --no-commit
-[status]
-  relativePaths = false
-[diff "ruby"]
-  funcname = ^ *\\(\\(class\\|module\\|def\\) .*\\)
-[branch]
-  autosetuprebase = always
-[core]
-	excludesfile = /Users/cgiroir/.gitconfig.ignore
-  autocrlf = input
-[github]
-  user = Kelsin
 [user]
-  name = Christopher Giroir
-  email = kelsin@valefor.com
+    # Force per-repo identities.
+    # See https://www.micah.soy/posts/setting-up-git-identities/
+    useConfigOnly = true
+    # Identites should go in ~/.git_identities/.gitconfig
+
+[include]
+    path = ~/.git_identities/.gitconfig
+
+[push]
+    default = simple
+
+[core]
+    excludesfile = ~/.gitignore_global
+
+[color]
+    ui = auto
+    interactive = auto
+    diff = auto
+    branch = auto
+    status = auto
+
+[log]
+    decorate = short
+
+[pager]
+    status = false
+    diff = false
+    show-branch = true
+
 [url "ssh://git@github.com/"]
-  insteadOf = https://github.com/
-[includeIf "gitdir:~/src/improbable/"]
-  path = .gitconfig.improbable
-[remote "origin"]
-  prune = true
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
+    insteadOf = https://github.com/
+
+[alias]
+    st = status
+    ci = commit
+    co = checkout
+    ru = remote update
+    br = branch
+    cam = commit -a -m
+    staged = diff --cached
+    unstaged = diff
+    both = diff HEAD
+    oneline = log --oneline
+    bail = reset --hard HEAD^
+    tree = log --graph --decorate --pretty=oneline --abbrev-commit --all
+    l = log --graph --decorate --oneline
+    ls = log --graph --decorate --oneline --stat
+    la = log --graph --decorate --oneline --all
+    lsa = log --graph --decorate --oneline --stat --all
+    myhist = !git log --author=\"$(git config user.name)\" --format=%H |xargs git show --name-only --format=-------------%n%Cred%s%Creset%n%Cblue%h%Creset
+    ltree = !git log --graph --abbrev-commit --decorate --format=format:'%C(yellow)%h%C(reset) - %C(normal)%aD%C(reset) %C(green)(%ar)%C(reset)%C(yellow)%d%C(reset)%n''          %C(bold normal)%s%C(reset) %C(cyan)- %an%C(reset)'
+    identity = "! git config user.name \"$(git config user.$1.name)\"; git config user.email \"$(git config user.$1.email)\"; git config user.signingkey \"$(git config user.$1.signingkey)\"; git config commit.gpgsign true; :"

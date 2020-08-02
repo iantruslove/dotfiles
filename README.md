@@ -1,12 +1,8 @@
-```
- _        _     _       
-| | _____| |___(_)_ __  
-| |/ / _ \ / __| | '_ \ 
-|   <  __/ \__ \ | | | |
-|_|\_\___|_|___/_|_| |_|
-```
+# Dotfiles
 
-Dotfiles for Christopher Giroir <kelsin@valefor.com>
+dotfiles.
+
+Forked from https://github.com/kelsin/dotfiles
 
 ## Goals
 
@@ -26,19 +22,19 @@ sh](http://pubs.opengroup.org/onlinepubs/009695399/utilities/sh.html) and
 On a mac laptop:
 
 ```sh
-curl -o- https://raw.githubusercontent.com/kelsin/dotfiles/master/bootstrap | sh -s mac
+curl -o- https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh -s mac
 ```
 
 On a server:
 ```sh
-curl -o- https://raw.githubusercontent.com/kelsin/dotfiles/master/bootstrap | sh -s server
+curl -o- https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh -s server
 ```
 
 If you need to use wget the commands become:
 
 ```sh
-wget -O - https://raw.githubusercontent.com/kelsin/dotfiles/master/bootstrap | sh mac
-wget -O - https://raw.githubusercontent.com/kelsin/dotfiles/master/bootstrap | sh server
+wget -O - https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh mac
+wget -O - https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh server
 ```
 
 ### Installing
@@ -95,5 +91,3 @@ those dotfile packages are currently stowed.
 These are other solutions for storing your dotfiles:
 
 * [rcm](https://github.com/thoughtbot/rcm) rc file management utilities
-
-

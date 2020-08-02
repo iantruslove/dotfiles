@@ -1,15 +1,74 @@
+# -*- mode: sh -*-
+
 # Set Title
 function set-title {
   case $TERM in
-    (tmux|screen)*)
+    tmux|screen)
       if [ -n "$TMUX" ]; then
         tmux rename-window -t${TMUX_PANE} $*
       else
         printf "\ek$*\e\\"
       fi
       ;;
-    (alacritty|xterm|cygwin)*)
+    alacritty*|xterm*|cygwin*)
       printf "\033]0;$*\007"
       ;;
   esac
+}
+
+################################################################################
+# fix-agent - from Joe's https://gist.github.com/joegallo/84df64e178a5ba25899b
+function agent-path
+{
+    case $(uname) in
+        Darwin)
+            echo "*launch*/Listeners"
+            ;;
+        *)
+            echo "*ssh*/agent\.*"
+            ;;
+    esac
+}
+
+function agent-sockets
+{
+    find -L /tmp -uid $UID -path $(agent-path) -type s 2> /dev/null
+}
+
+function find-agent
+{
+    if [ -z "$(agent-sockets)" ]; then
+        echo "no agent found"
+        return 1
+    else
+        /bin/ls -t1 $(agent-sockets) | head -1
+    fi
+}
+
+function fix-agent
+{
+    export SSH_AUTH_SOCK="$(find-agent)"
+    ssh-add -l > /dev/null
+}
+
+################################################################################
+
+aws_email=__________________  # (your email address)
+iam_id=____________  # (12 digits)
+
+# Sets AWS access ID and secret access key environment variables using an MFA OTP.
+# Usage:
+#   mfa <mfa-code>
+function mfa () {
+    unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
+
+    CREDS=`aws sts get-session-token --serial-number arn:aws:iam::$iam_id:mfa/$aws_email --token-code $1`
+
+    KEY=`echo $CREDS | jq -r .Credentials.AccessKeyId`
+    SECRET=`echo $CREDS | jq -r .Credentials.SecretAccessKey`
+    SESSION=`echo $CREDS | jq -r .Credentials.SessionToken`
+
+    export AWS_ACCESS_KEY_ID=$KEY
+    export AWS_SECRET_ACCESS_KEY=$SECRET
+    export AWS_SESSION_TOKEN=$SESSION
 }
