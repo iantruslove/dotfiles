@@ -10,19 +10,27 @@ STOW_DIR=`dirname $0`
 pushd $STOW_DIR > /dev/null
 
 case $1 in
-  mac|linux)
-    for package in $WORKSTATION_PACKAGES; do
-      stow -R $package &> /dev/null
-    done
+    mac|linux)
+        packages=$WORKSTATION_PACKAGES
     ;;
   server)
-    for package in $SERVER_PACKAGES; do
-      stow -R $package &> /dev/null
-    done
-    ;;
+        packages=$SERVER_PACKAGES
+        ;;
   *)
-    echo "Invalid group"
+      echo "Invalid group"
+      exit 1
     ;;
 esac
+
+for package in $packages; do
+    echo -n "Stowing $package...  "
+    output=$(stow -R $package 2>&1)
+    result=$?
+    if [ $result -eq 0 ]; then
+        echo "ok"
+    else
+        echo "ERROR: $output"
+    fi
+done
 
 popd
