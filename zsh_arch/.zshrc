@@ -151,18 +151,31 @@ export LESS_TERMCAP_us=$'\E[01;36m'
 export LESS=-r
 
 ################################################################################
+## Plugins section
 
-## Plugins section: Enable fish style features
-# Use syntax highlighting
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# Use history substring search
-source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
-# bind UP and DOWN arrow keys to history substring search
-zmodload zsh/terminfo
-bindkey "$terminfo[kcuu1]" history-substring-search-up
-bindkey "$terminfo[kcud1]" history-substring-search-down
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+[ -d ~/.zplug ] || git clone https://github.com/b4b4r07/zplug ~/.zplug
+. ~/.zplug/init.zsh
+
+zplug "plugins/cargo",   from:oh-my-zsh
+zplug "plugins/fzf", from:oh-my-zsh
+zplug "plugins/git", from:oh-my-zsh
+zplug "plugins/golang", from:oh-my-zsh
+zplug "plugins/history", from:oh-my-zsh
+zplug "plugins/pyenv", from:oh-my-zsh
+zplug "plugins/rust", from:oh-my-zsh
+zplug "plugins/rustup", from:oh-my-zsh
+zplug "plugins/terraform", from:oh-my-zsh
+zplug "plugins/z", from:oh-my-zsh
+zplug "plugins/zsh-autosuggestions", from:oh-my-zsh
+zplug "plugins/zsh-completions", from:oh-my-zsh
+zplug "plugins/zsh-syntax-highlighting", from:oh-my-zsh
+
+# Install plugins if there are plugins that have not been installed
+zplug check || zplug install
+
+# Load Plugins
+zplug load
+
 
 ################################################################################
 
