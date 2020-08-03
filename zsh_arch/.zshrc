@@ -72,7 +72,11 @@ setopt prompt_subst
 # Maia prompt
 PROMPT="%B%{$fg[cyan]%}%(4~|%-1~/.../%2~|%~)%u%b >%{$fg[cyan]%}>%B%(?.%{$fg[cyan]%}.%{$fg[red]%})>%{$reset_color%}%b " # Print some system information when the shell is first started
 # Print a greeting message when shell is started
-echo $USER@$HOST  $(uname -srm) $(lsb_release -rcs)
+if type lsb_release >/dev/null 2>&1; then
+    echo $USER@$HOST  $(uname -srm) $(lsb_release -rcs)
+else
+    echo $USER@$HOST  $(uname -srm)
+fi
 ## Prompt on right side:
 #  - shows status of git when in git repository (code adapted from https://techanic.net/2012/12/30/my_git_prompt_for_zsh.html)
 #  - shows exit status of previous command (if previous command finished with an error)
@@ -139,7 +143,6 @@ git_prompt_string() {
 # Right prompt with exit status of previous command marked with ✓ or ✗
  #RPROMPT="%(?.%{$fg[green]%}✓ %{$reset_color%}.%{$fg[red]%}✗ %{$reset_color%})"
 
-
 # Color man pages
 export LESS_TERMCAP_mb=$'\E[01;32m'
 export LESS_TERMCAP_md=$'\E[01;32m'
@@ -180,34 +183,38 @@ zplug load
 ################################################################################
 
 # Apply different settings for different terminals
-case $(basename "$(cat "/proc/$PPID/comm")") in
-  login)
-    	RPROMPT="%{$fg[red]%} %(?..[%?])"
-    	alias x='startx ~/.xinitrc'      # Type name of desired desktop after x, xinitrc is configured for it
-    ;;
-#  'tmux: server')
-#        RPROMPT='$(git_prompt_string)'
-#		## Base16 Shell color themes.
-#		#possible themes: 3024, apathy, ashes, atelierdune, atelierforest, atelierhearth,
-#		#atelierseaside, bespin, brewer, chalk, codeschool, colors, default, eighties,
-#		#embers, flat, google, grayscale, greenscreen, harmonic16, isotope, londontube,
-#		#marrakesh, mocha, monokai, ocean, paraiso, pop (dark only), railscasts, shapesifter,
-#		#solarized, summerfruit, tomorrow, twilight
-#		#theme="eighties"
-#		#Possible variants: dark and light
-#		#shade="dark"
-#		#BASE16_SHELL="/usr/share/zsh/scripts/base16-shell/base16-$theme.$shade.sh"
-#		#[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
-#		# Use autosuggestion
-#		source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-#		ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-#  		ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+# case $(basename "$(cat "/proc/$PPID/comm")") in
+#   login)
+#     	RPROMPT="%{$fg[red]%} %(?..[%?])"
+#     	alias x='startx ~/.xinitrc'      # Type name of desired desktop after x, xinitrc is configured for it
 #     ;;
-  *)
-        RPROMPT='$(git_prompt_string)'
-		# Use autosuggestion
-		source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-		ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-  		ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
-    ;;
-esac
+# #  'tmux: server')
+# #        RPROMPT='$(git_prompt_string)'
+# #		## Base16 Shell color themes.
+# #		#possible themes: 3024, apathy, ashes, atelierdune, atelierforest, atelierhearth,
+# #		#atelierseaside, bespin, brewer, chalk, codeschool, colors, default, eighties,
+# #		#embers, flat, google, grayscale, greenscreen, harmonic16, isotope, londontube,
+# #		#marrakesh, mocha, monokai, ocean, paraiso, pop (dark only), railscasts, shapesifter,
+# #		#solarized, summerfruit, tomorrow, twilight
+# #		#theme="eighties"
+# #		#Possible variants: dark and light
+# #		#shade="dark"
+# #		#BASE16_SHELL="/usr/share/zsh/scripts/base16-shell/base16-$theme.$shade.sh"
+# #		#[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
+# #		# Use autosuggestion
+# #		source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# #		ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+# #  		ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+# #     ;;
+#   *)
+#         RPROMPT='$(git_prompt_string)'
+# 		# Use autosuggestion
+# #		source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# 		ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+#   		ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+#     ;;
+# esac
+
+RPROMPT='$(git_prompt_string)'
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
