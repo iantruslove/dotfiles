@@ -30,9 +30,6 @@ zplug "plugins/kubectl", from:oh-my-zsh
 zplug "sorin-ionescu/prezto", use:"modules/completion/init.zsh"
 zplug "tmuxinator/tmuxinator", use:"completion/tmuxinator.zsh"
 
-# Dircolors
-(( $+commands[gdircolors] )) && eval $(gdircolors ~/.dircolors)
-
 # Lesspipe
 (( $+commands[lesspipe.sh] )) && eval $(lesspipe.sh)
 
