@@ -159,7 +159,7 @@ export LESS=-r
 [ -d ~/.zplug ] || git clone https://github.com/b4b4r07/zplug ~/.zplug
 . ~/.zplug/init.zsh
 
-zplug "plugins/cargo",   from:oh-my-zsh
+zplug "plugins/cargo", from:oh-my-zsh
 zplug "plugins/fzf", from:oh-my-zsh
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/golang", from:oh-my-zsh
@@ -167,14 +167,19 @@ zplug "plugins/history", from:oh-my-zsh
 zplug "plugins/pyenv", from:oh-my-zsh
 zplug "plugins/rust", from:oh-my-zsh
 zplug "plugins/rustup", from:oh-my-zsh
-zplug "plugins/terraform", from:oh-my-zsh
 zplug "plugins/z", from:oh-my-zsh
+zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 zplug "plugins/zsh-autosuggestions", from:oh-my-zsh
 zplug "plugins/zsh-completions", from:oh-my-zsh
 zplug "plugins/zsh-syntax-highlighting", from:oh-my-zsh
 
 # Install plugins if there are plugins that have not been installed
-zplug check || zplug install
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
 
 # Load Plugins
 zplug load
