@@ -45,5 +45,6 @@ fi
 
 # Run the update
 if [ "$1" = "mac" ]; then
-  # TODO: Uncomment ### ~/bin/update
+    # TODO: Uncomment ### ~/bin/update
+    echo "TODO"
 fi
