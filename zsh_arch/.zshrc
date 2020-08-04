@@ -6,7 +6,7 @@ setopt rcexpandparam                                            # Array expensio
 setopt nocheckjobs                                              # Don't warn about running processes when exiting
 setopt numericglobsort                                          # Sort filenames numerically when it makes sense
 setopt nobeep                                                   # No beep
-setopt appendhistory                                            # Immediately append history instead of overwriting
+
 setopt histignorealldups                                        # If a new command is a duplicate, remove the older one
 setopt autocd                                                   # if only directory path is entered, cd there.
 
@@ -17,9 +17,7 @@ zstyle ':completion:*' rehash true                              # automatically 
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
-HISTFILE=~/.zhistory
-HISTSIZE=1000
-SAVEHIST=500
+
 
 WORDCHARS=${WORDCHARS//\/[&.;]}                                 # Don't consider certain characters part of the word
 
@@ -60,8 +58,7 @@ bindkey '^[[Z' undo                                             # Shift+tab undo
 
 ################################################################################
 # Theming section
-autoload -U compinit colors zcalc
-compinit -d
+autoload -U colors zcalc
 colors
 
 # enable substitution for prompt
@@ -159,30 +156,40 @@ export LESS=-r
 [ -d ~/.zplug ] || git clone https://github.com/b4b4r07/zplug ~/.zplug
 . ~/.zplug/init.zsh
 
-zplug "plugins/cargo", from:oh-my-zsh
-zplug "plugins/fzf", from:oh-my-zsh
-zplug "plugins/git", from:oh-my-zsh
-zplug "plugins/golang", from:oh-my-zsh
-zplug "plugins/history", from:oh-my-zsh
-zplug "plugins/pyenv", from:oh-my-zsh
-zplug "plugins/rust", from:oh-my-zsh
-zplug "plugins/rustup", from:oh-my-zsh
-zplug "plugins/z", from:oh-my-zsh
+# zplug "plugins/cargo", from:oh-my-zsh
+zplug "plugins/fzf", from:oh-my-zsh  # Also needs `fzf` executable installed
+# zplug "plugins/git", from:oh-my-zsh
+# zplug "plugins/golang", from:oh-my-zsh
+# zplug "b4b4r07/zsh-history"
+# zplug "plugins/pyenv", from:oh-my-zsh
+# zplug "plugins/rust", from:oh-my-zsh
+# zplug "plugins/rustup", from:oh-my-zsh
+zplug "agkozak/zsh-z"
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
-zplug "plugins/zsh-autosuggestions", from:oh-my-zsh
-zplug "plugins/zsh-completions", from:oh-my-zsh
-zplug "plugins/zsh-syntax-highlighting", from:oh-my-zsh
+zplug "zsh-users/zsh-autosuggestions"
+zplug "zsh-users/zsh-completions"
+# zplug "zsh-users/zsh-history-substring-search", defer:2
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
+
+# History
+HISTFILE=~/.zsh_history
+HISTSIZE=1000
+SAVEHIST=500
+setopt SHARE_HISTORY
+setopt EXTENDED_HISTORY
+setopt APPEND_HISTORY  # Immediately append history instead of overwriting
+setopt HIST_IGNORE_SPACE
+setopt HIST_REDUCE_BLANKS
 
 # Install plugins if there are plugins that have not been installed
-if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
-fi
+zplug check || zplug install
 
 # Load Plugins
 zplug load
+
+# Having loaded the zsh-completions plugin, reload completion backends:
+autoload -U compinit
+compinit -d
 
 
 ################################################################################
