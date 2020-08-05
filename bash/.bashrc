@@ -9,9 +9,6 @@
 # need the host name set sometimes
 [ -z "$HOSTNAME" ] && export HOSTNAME=$(hostname)
 
-# Path setup for bash
-export PATH="$HOME/bin:/usr/local/sbin:/usr/local/bin:$PATH"
-
 # Functions / Aliases
 [ -f ~/.functions ] && . ~/.functions
 [ -f ~/.aliases ] && . ~/.aliases
