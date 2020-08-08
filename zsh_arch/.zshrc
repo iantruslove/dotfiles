@@ -175,7 +175,6 @@ zplug "zsh-users/zsh-syntax-highlighting", defer:2
 HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=500
-setopt SHARE_HISTORY
 setopt EXTENDED_HISTORY
 setopt APPEND_HISTORY  # Immediately append history instead of overwriting
 setopt HIST_IGNORE_SPACE
