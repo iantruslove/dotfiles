@@ -24,6 +24,7 @@ alias j='open https://improbableio.atlassian.net/browse/$(git rev-parse --abbrev
 
 # Docker
 alias dr='docker run -it --rm'
+alias drs='docker_run_shell'  # see .functions
 
 # Whats My IP
 alias wmi='dig +short myip.opendns.com @resolver1.opendns.com'
