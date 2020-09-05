@@ -146,3 +146,9 @@ fi
 if [[ ! "$SSH_AUTH_SOCK" ]]; then
     fix-agent
 fi
+
+for f in ~/.site/*; do
+    if [[ -x "$f" ]] ; then
+        source $f;
+    fi
+done

@@ -5,6 +5,8 @@ node_modules
 # Main Ignores
 .gitconfig.user
 
+main/.site/*
+
 # Emacs Ignores
 emacs/.emacs.d/.cache
 emacs/.emacs.d/.cask
