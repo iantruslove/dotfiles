@@ -15,9 +15,11 @@ Forked from https://github.com/kelsin/dotfiles
 
 ### Bootstrapping
 
-Dependencies: a [posix
-sh](http://pubs.opengroup.org/onlinepubs/009695399/utilities/sh.html) and
-[curl](https://curl.haxx.se/) or [wget](https://www.gnu.org/software/wget/)
+Dependencies: a [posix sh][] and [curl][] or [wget][].
+
+[posix sh]: (http://pubs.opengroup.org/onlinepubs/009695399/utilities/sh.html)
+[curl]: https://curl.haxx.se/
+[wget]: https://www.gnu.org/software/wget/
 
 On a mac laptop:
 
