@@ -25,6 +25,12 @@ alias j='open https://improbableio.atlassian.net/browse/$(git rev-parse --abbrev
 # Docker
 alias dr='docker run -it --rm'
 alias drs='docker_run_shell'  # see .functions
+alias drm='docker rm $(docker ps -a -f status=exited -q)'
+
+# Git
+alias gst='git status'
+alias gpr='git pull --rebase'  # Note possible collision with `gpr` command...
+alias gf='git fetch -a'
 
 # Whats My IP
 alias wmi='dig +short myip.opendns.com @resolver1.opendns.com'
