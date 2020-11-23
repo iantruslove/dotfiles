@@ -27,7 +27,13 @@ alias dr='docker run -it --rm'
 alias drs='docker_run_shell'  # see .functions
 alias drm='docker rm $(docker ps -a -f status=exited -q)'
 
+# Kubernetes
+alias k='kubectl'
+alias kns='kubens'
+alias kctx='kubectx'
+
 # Git
+alias gco='git checkout'
 alias gst='git status'
 alias gpr='git pull --rebase'  # Note possible collision with `gpr` command...
 alias gf='git fetch -a'
