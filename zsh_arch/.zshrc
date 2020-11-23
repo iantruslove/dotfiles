@@ -230,6 +230,8 @@ RPROMPT='$(git_prompt_string)'
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
+source ~/.env
+
 for f in ~/.site/*; do
     if [[ -x "$f" ]] ; then
         source $f;

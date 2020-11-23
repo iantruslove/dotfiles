@@ -1,5 +1,5 @@
 # Source main environment file
-. ~/.env
+source ~/.env
 
 # Paths
 # Ensure path arrays do not contain duplicates.
