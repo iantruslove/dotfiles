@@ -5,7 +5,7 @@
 WORKSTATION_PACKAGES="bash main tmux zsh_arch"
 SERVER_PACKAGES="bash main tmux"
 
-STOW_DIR=`dirname $0`
+STOW_DIR=~/.dotfiles  # `dirname $0`
 
 pushd $STOW_DIR > /dev/null
 
