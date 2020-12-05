@@ -2,7 +2,7 @@
 
 # WORKSTATION_PACKAGES="emacs main node ruby tmux vim zsh" ## TODO: Fix and uncomment all of these
 # SERVER_PACKAGES="bash main screen tmux vim" ## TODO: Fix and uncomment all of these
-WORKSTATION_PACKAGES="bash main tmux zsh_arch"
+WORKSTATION_PACKAGES="bash zsh_arch main node tmux"
 SERVER_PACKAGES="bash main tmux"
 
 STOW_DIR=~/.dotfiles  # `dirname $0`
