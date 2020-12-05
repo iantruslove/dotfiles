@@ -1,17 +1,6 @@
 #!/usr/bin/env zsh
 
 # Load
-. $DOTFILES/node/.zsh/nodenv.zsh
+. ~/.zsh/nvm.zsh
 
-# Install latest LTS node
-nodenv install -s 10.14.0
-npm install -g npm bunyan ember-cli yarn serverless
-nodenv rehash
-
-# Install latest node
-nodenv install -s 11.3.0
-npm install -g npm bunyan ember-cli yarn serverless
-nodenv rehash
-
-echo Done updating node
-
+nvm install --lts
