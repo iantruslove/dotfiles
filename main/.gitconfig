@@ -3,9 +3,17 @@
     # See https://www.micah.soy/posts/setting-up-git-identities/
     useConfigOnly = true
     # Identites should go in ~/.git_identities/.gitconfig
-
 [include]
     path = ~/.git_identities/.gitconfig
+    #
+    # Identities should look like:
+    #
+    #    [user "github"]
+    #      name = <name>
+    #      email = <email>
+    #      signingkey = <keyID>
+    #      gpgsign = true
+    #
 
 [push]
     default = simple
@@ -50,4 +58,4 @@
     lsa = log --graph --decorate --oneline --stat --all
     myhist = !git log --author=\"$(git config user.name)\" --format=%H |xargs git show --name-only --format=-------------%n%Cred%s%Creset%n%Cblue%h%Creset
     ltree = !git log --graph --abbrev-commit --decorate --format=format:'%C(yellow)%h%C(reset) - %C(normal)%aD%C(reset) %C(green)(%ar)%C(reset)%C(yellow)%d%C(reset)%n''          %C(bold normal)%s%C(reset) %C(cyan)- %an%C(reset)'
-    identity = "! git config user.name \"$(git config user.$1.name)\"; git config user.email \"$(git config user.$1.email)\"; git config user.signingkey \"$(git config user.$1.signingkey)\"; git config commit.gpgsign true; :"
+    identity = "! git config user.name \"$(git config user.$1.name)\"; git config user.email \"$(git config user.$1.email)\"; git config user.signingkey \"$(git config user.$1.signingkey)\"; git config commit.gpgsign \"$(git config user.$1.gpgsign || echo false)\"; :"
