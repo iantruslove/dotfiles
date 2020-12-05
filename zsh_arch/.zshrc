@@ -233,6 +233,12 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
 source ~/.env
 
+# Load local plugins
+for script in ~/.zsh/**/*.zsh; do
+  source $script
+done
+
+
 for f in ~/.site/*; do
     if [[ -x "$f" ]] ; then
         source $f;
