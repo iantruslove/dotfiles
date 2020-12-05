@@ -187,9 +187,6 @@ zplug check || zplug install
 # Load Plugins
 zplug load
 
-# Having loaded the zsh-completions plugin, reload completion backends:
-autoload -U compinit
-compinit -d
 
 
 ################################################################################
@@ -238,3 +235,8 @@ for f in ~/.site/*; do
         source $f;
     fi
 done
+
+# Having loaded the zsh-completions plugin and possibly others during
+# the starup sequence, reload completion backends:
+autoload -U compinit
+compinit -d
