@@ -233,11 +233,25 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
 source ~/.env
 
+# Keychains and SSH agents:
+if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+    if [[ -x $(which keychain) ]]; then
+        # Keychain is wicked smaht, but not necessarily installed
+        eval `keychain --eval --agents ssh` > /dev/null
+    else
+        eval `ssh-agent` > /dev/null
+    fi
+fi
+
+# Fix ssh-agent
+if [[ ! "$SSH_AUTH_SOCK" ]]; then
+    fix-agent
+fi
+
 # Load local plugins
 for script in ~/.zsh/**/*.zsh; do
   source $script
 done
-
 
 for f in ~/.site/*; do
     if [[ -x "$f" ]] ; then

@@ -138,7 +138,7 @@ if ! pgrep -u "$USER" ssh-agent > /dev/null; then
         # Keychain is wicked smaht, but not necessarily installed
         eval `keychain --eval --agents ssh` > /dev/null
     else
-        ssh-agent > /dev/null
+        eval `ssh-agent` > /dev/null
     fi
 fi
 
