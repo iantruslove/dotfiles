@@ -38,6 +38,9 @@ alias gst='git status'
 alias gpr='git pull --rebase'  # Note possible collision with `gpr` command...
 alias gf='git fetch -a'
 
+# Rush
+alias rbt.='rush build --to .'
+
 # Whats My IP
 alias wmi='dig +short myip.opendns.com @resolver1.opendns.com'
 
