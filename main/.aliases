@@ -75,5 +75,12 @@ if [ `uname` = "Darwin" ]; then
     alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 fi
 
+# Fix date on mac (requires coreutils - `brew install coreutils`)
+if [ `uname` = "Darwin" ]; then
+    if type -p gdate &>/dev/null; then
+        alias date=gdate
+    fi
+fi
+
 # Emacs
 alias pemacs='emacs -Q -l ~/.emacs.d/profile-dotemacs.el --eval "(setq profile-dotemacs-file (setq load-file-name \"~/.emacs.d/init.el\"))" -f profile-dotemacs'
