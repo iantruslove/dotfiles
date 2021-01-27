@@ -133,14 +133,14 @@ function __prompt {
 export PROMPT_COMMAND=__prompt
 
 # Keychains and SSH agents:
-if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+#if ! pgrep -u "$USER" ssh-agent > /dev/null; then
     if [[ -x $(which keychain) ]]; then
         # Keychain is wicked smaht, but not necessarily installed
-        eval `keychain --eval --agents ssh` > /dev/null
+        eval `keychain --eval --agents ssh 2>/dev/null`
     else
         eval `ssh-agent` > /dev/null
     fi
-fi
+#fi
 
 # Fix ssh-agent
 if [[ ! "$SSH_AUTH_SOCK" ]]; then
