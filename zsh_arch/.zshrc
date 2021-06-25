@@ -259,6 +259,22 @@ for f in ~/.site/*; do
     fi
 done
 
+# Automatically use pipenvs
+function auto_pipenv_shell {
+    if [ ! -n "${PIPENV_ACTIVE+1}" ] ; then
+        if [ -f "Pipfile" ] ; then
+            if command -v pipenv &> /dev/null ; then
+                pipenv shell
+            fi
+        fi
+    fi
+}
+function cd {
+    builtin cd "$@"
+    auto_pipenv_shell
+}
+
+
 # Having loaded the zsh-completions plugin and possibly others during
 # the starup sequence, reload completion backends:
 autoload -U compinit
