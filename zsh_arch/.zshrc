@@ -177,7 +177,7 @@ HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=500
 setopt EXTENDED_HISTORY
-setopt APPEND_HISTORY  # Immediately append history instead of overwriting
+setopt INC_APPEND_HISTORY_TIME  # Multiple sessions contribute to a shared history
 setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
 
