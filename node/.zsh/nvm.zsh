@@ -1,9 +1,9 @@
 #!/usr/bin/env zsh
 
 export NVM_DIR="$HOME/.nvm"
+_nvm_dir=$NVM_DIR
 
-# Homebrew is changing where it lives, hence this conditional...
-_nvm_dir=""
+# Homebrew is changing where it places binaries. This handles brew installations:
 [[ -d "/usr/local/opt/nvm/" ]] && _nvm_dir=/usr/local/opt/nvm
 [[ -d "/opt/homebrew/opt/nvm/" ]] && _nvm_dir=/opt/homebrew/opt/nvm
 
