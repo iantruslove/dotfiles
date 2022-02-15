@@ -20,6 +20,7 @@
 
 [core]
     excludesfile = ~/.gitignore_global
+    editor = emacsclient -nw -a vim -t
 
 [color]
     ui = auto
