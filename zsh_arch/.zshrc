@@ -174,8 +174,8 @@ zplug "zsh-users/zsh-syntax-highlighting", defer:2
 
 # History
 HISTFILE=~/.zsh_history
-HISTSIZE=1000
-SAVEHIST=500
+HISTSIZE=100000
+SAVEHIST=100000
 setopt EXTENDED_HISTORY
 setopt INC_APPEND_HISTORY_TIME  # Multiple sessions contribute to a shared history
 setopt HIST_IGNORE_SPACE
