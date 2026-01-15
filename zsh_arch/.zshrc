@@ -1,3 +1,5 @@
+zmodload zsh/zprof
+
 ## Options section
 setopt correct                                                  # Auto correct mistakes
 setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
@@ -151,27 +153,34 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;36m'
 export LESS=-r
 
+# ################################################################################
+# ## Plugins section
+
+# [ -d ~/.zplug ] || git clone https://github.com/b4b4r07/zplug ~/.zplug
+# . ~/.zplug/init.zsh
+
+# # zplug "plugins/cargo", from:oh-my-zsh
+# zplug "plugins/fzf", from:oh-my-zsh  # Also needs `fzf` executable installed
+# # zplug "plugins/git", from:oh-my-zsh
+# # zplug "plugins/golang", from:oh-my-zsh
+# # zplug "b4b4r07/zsh-history"
+# # zplug "plugins/pyenv", from:oh-my-zsh
+# # zplug "plugins/rust", from:oh-my-zsh
+# # zplug "plugins/rustup", from:oh-my-zsh
+# zplug "agkozak/zsh-z"
+# zplug 'zplug/zplug', hook-build:'zplug --self-manage'
+# zplug "zsh-users/zsh-autosuggestions"
+# zplug "zsh-users/zsh-completions"
+# # zplug "zsh-users/zsh-history-substring-search", defer:2
+# zplug "zsh-users/zsh-syntax-highlighting", defer:2
+
+# # Install plugins if there are plugins that have not been installed
+# zplug check || zplug install
+
+# # Load Plugins
+# zplug load
+
 ################################################################################
-## Plugins section
-
-[ -d ~/.zplug ] || git clone https://github.com/b4b4r07/zplug ~/.zplug
-. ~/.zplug/init.zsh
-
-# zplug "plugins/cargo", from:oh-my-zsh
-zplug "plugins/fzf", from:oh-my-zsh  # Also needs `fzf` executable installed
-# zplug "plugins/git", from:oh-my-zsh
-# zplug "plugins/golang", from:oh-my-zsh
-# zplug "b4b4r07/zsh-history"
-# zplug "plugins/pyenv", from:oh-my-zsh
-# zplug "plugins/rust", from:oh-my-zsh
-# zplug "plugins/rustup", from:oh-my-zsh
-zplug "agkozak/zsh-z"
-zplug 'zplug/zplug', hook-build:'zplug --self-manage'
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-completions"
-# zplug "zsh-users/zsh-history-substring-search", defer:2
-zplug "zsh-users/zsh-syntax-highlighting", defer:2
-
 # History
 HISTFILE=~/.zsh_history
 HISTSIZE=100000
@@ -180,12 +189,6 @@ setopt EXTENDED_HISTORY
 setopt INC_APPEND_HISTORY_TIME  # Multiple sessions contribute to a shared history
 setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
-
-# Install plugins if there are plugins that have not been installed
-zplug check || zplug install
-
-# Load Plugins
-zplug load
 
 if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
@@ -227,7 +230,43 @@ fi
 #     ;;
 # esac
 
-RPROMPT='$(git_prompt_string)'
+
+################################################################################
+# Async RPROMPT for git status
+# Uses zsh's native zle -F for async file descriptor monitoring
+
+typeset -g _async_git_prompt=""
+
+_async_git_prompt_callback() {
+    local fd=$1
+    {
+        _async_git_prompt=""
+        while IFS= read -r -u $fd line; do
+            _async_git_prompt+="$line"
+        done
+    } always {
+        zle -F $fd 2>/dev/null
+        exec {fd}<&-
+    }
+    zle && zle reset-prompt
+}
+
+_async_git_prompt_precmd() {
+    _async_git_prompt=""  # Clear while loading
+
+    # Only run in git repos
+    git rev-parse --is-inside-work-tree &>/dev/null || return
+
+    local fd
+    exec {fd}< <(git_prompt_string 2>/dev/null)
+    zle -F $fd _async_git_prompt_callback
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _async_git_prompt_precmd
+
+RPROMPT='${_async_git_prompt}'
+
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
@@ -269,13 +308,27 @@ function auto_pipenv_shell {
         fi
     fi
 }
-function cd {
-    builtin cd "$@"
-    auto_pipenv_shell
-}
+
+# function cd {
+#     builtin cd "$@"
+#     auto_pipenv_shell
+# }
 
 
-# Having loaded the zsh-completions plugin and possibly others during
-# the starup sequence, reload completion backends:
-autoload -U compinit
-compinit -d
+# # Having loaded the zsh-completions plugin and possibly others during
+# # the starup sequence, reload completion backends:
+# autoload -U compinit
+# compinit -d
+
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/iantruslove/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+alias gam="/Users/iantruslove/bin/gam/gam"
+
+## Uncomment to profile startup:
+# zprof
+
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
