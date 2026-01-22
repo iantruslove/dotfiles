@@ -4,6 +4,10 @@
 alias _='sudo'
 alias please='sudo'
 
+# Emacsclient
+alias e='emacsclient -c -n'
+alias et='emacsclient -t'
+
 # No Vi
 alias vi='vim'
 alias e='emacsclient -a vim -t'
