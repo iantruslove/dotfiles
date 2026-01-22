@@ -12,6 +12,9 @@ alias et='emacsclient -t'
 alias vi='vim'
 alias e='emacsclient -a vim -t'
 
+# No Vim (use \vim to get back to it)
+alias vim=e
+
 # Make sure ls has colors and defaults to -h
 if ls --color -d . >/dev/null 2>&1; then
     alias ls='ls --color=auto -h'
