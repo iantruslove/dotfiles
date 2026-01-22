@@ -38,6 +38,7 @@ alias drm='docker rm $(docker ps -a -f status=exited -q)'
 alias k='kubectl'
 alias kns='kubens'
 alias kctx='kubectx'
+alias k9s='k9s -A --logoless'
 
 # Git
 alias gco='git checkout'
