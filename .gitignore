@@ -4,6 +4,7 @@ node_modules
 
 # Main Ignores
 .gitconfig.user
+main/.env.secrets
 
 main/.site/*
 
