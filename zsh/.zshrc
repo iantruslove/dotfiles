@@ -1,3 +1,6 @@
+# .zshrc - Sourced for interactive shells.
+# Configure shell options, keybindings, aliases, plugins, prompt, history, and completions.
+
 ## Options section
 setopt correct                                                  # Auto correct mistakes
 setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
@@ -193,7 +196,7 @@ zplug load
 
 # This replaces the zsh-z plugin.
 # Depends on `brew install zoxide`
-eval "$(zoxide init zsh)"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 
 ################################################################################
 # History
@@ -263,37 +266,33 @@ autoload bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
 
 # aws-cli completions:
-complete -C '/opt/homebrew/bin/aws_completer' aws
+(( $+commands[aws_completer] )) && complete -C "$(command -v aws_completer)" aws
 
 # Pipenv
-eval "$(_PIPENV_COMPLETE=zsh_source pipenv)"
-
-alias gam="/Users/iantruslove/bin/gam/gam"
+(( $+commands[pipenv] )) && eval "$(_PIPENV_COMPLETE=zsh_source pipenv)"
 
 ################################################################################
 # NVM
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# the following is taken from
-# https://github.com/nvm-sh/nvm/issues/1277#issuecomment-693390529 to decrease
-# nvm's effect on shell startup time
-
-NODE_GLOBALS=(`find ~/.nvm/versions/node -maxdepth 3 -type l -wholename '*/bin/*' | xargs -n1 basename | sort | uniq`)
-NODE_GLOBALS+=(node nvm yarn)
-
-_load_nvm() {
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+if [[ -d "$NVM_DIR" ]]; then
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-}
 
-for cmd in "${NODE_GLOBALS[@]}"; do
-    eval "function ${cmd}(){ unset -f ${NODE_GLOBALS[*]}; _load_nvm; unset -f _load_nvm; ${cmd} \$@; }"
-done
-unset cmd NODE_GLOBALS
+    # the following is taken from
+    # https://github.com/nvm-sh/nvm/issues/1277#issuecomment-693390529 to decrease
+    # nvm's effect on shell startup time
 
-export PATH="$PATH:$HOME/.yarn/bin"
+    NODE_GLOBALS=(`find "$NVM_DIR/versions/node" -maxdepth 3 -type l -wholename '*/bin/*' 2>/dev/null | xargs -n1 basename | sort | uniq`)
+    NODE_GLOBALS+=(node nvm yarn)
 
-export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+    _load_nvm() {
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    }
+
+    for cmd in "${NODE_GLOBALS[@]}"; do
+        eval "function ${cmd}(){ unset -f ${NODE_GLOBALS[*]}; _load_nvm; unset -f _load_nvm; ${cmd} \$@; }"
+    done
+    unset cmd NODE_GLOBALS
+fi

@@ -1,3 +1,6 @@
+# .zprofile - Sourced for login shells, before .zshrc.
+# Configure login-session environment: source env files, set PATH, deduplicate paths.
+
 # Source main environment file
 source ~/.env
 
