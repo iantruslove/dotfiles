@@ -212,15 +212,16 @@ setopt HIST_REDUCE_BLANKS
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
-# Keychains and SSH agents:
-#if ! pgrep -u "$USER" ssh-agent > /dev/null; then
-    if [[ -x $(which keychain) ]]; then
-        # Keychain is wicked smaht, but not necessarily installed
-        eval `keychain --eval --agents ssh 2>/dev/null`
-    else
-        eval `ssh-agent` > /dev/null
-    fi
-#fi
+# SSH agent:
+# On Linux with systemd, use the user-managed socket if present.
+# Otherwise fall back to keychain (if installed) or a plain ssh-agent.
+if [[ -S "${XDG_RUNTIME_DIR}/ssh-agent.socket" ]]; then
+    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
+elif [[ -x $(which keychain) ]]; then
+    eval `keychain --eval --agents ssh 2>/dev/null`
+else
+    eval `ssh-agent` > /dev/null
+fi
 
 # # Load local plugins
 # for script in ~/.zsh/**/*.zsh; do
