@@ -12,8 +12,8 @@ config.initial_rows = 50
 
 -- or, changing the font size and color scheme.
 config.font_size = 12
-config.color_scheme = 'Monokai Soda'
--- config.color_scheme = 'Selenized Dark (Gogh)'
+-- config.color_scheme = 'Monokai Soda'
+config.color_scheme = 'Selenized Dark (Gogh)'
 -- config.color_scheme = 'Modus Vivendi (Gogh)'
 
 config.keys = {
