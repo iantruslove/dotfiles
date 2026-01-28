@@ -32,3 +32,5 @@ emacs/.emacs.d/url
 
 # XMonad Ignores
 xmonad/.xmonad/*.errors
+
+zsh/.zsh/cache/
