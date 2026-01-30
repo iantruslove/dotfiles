@@ -297,3 +297,5 @@ if [[ -d "$NVM_DIR" ]]; then
     done
     unset cmd NODE_GLOBALS
 fi
+
+. "$HOME/.local/bin/env"
