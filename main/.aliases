@@ -94,5 +94,22 @@ if [ `uname` = "Darwin" ]; then
     fi
 fi
 
+# Only define pbcopy / pbpaste if they don't already exist
+if ! command -v pbcopy >/dev/null 2>&1; then
+    pbcopy() {
+        local data
+        data=$(base64 | tr -d '\n')
+        printf '\033]52;c;%s\a' "$data"
+    }
+fi
+
+if ! command -v pbpaste >/dev/null 2>&1; then
+    pbpaste() {
+        # Request clipboard contents via OSC 52
+        # WezTerm responds by pasting it into the terminal
+        printf '\033]52;c;?\a'
+    }
+fi
+
 # Emacs
 alias pemacs='emacs -Q -l ~/.emacs.d/profile-dotemacs.el --eval "(setq profile-dotemacs-file (setq load-file-name \"~/.emacs.d/init.el\"))" -f profile-dotemacs'
