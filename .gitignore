@@ -35,4 +35,6 @@ xmonad/.xmonad/*.errors
 
 zsh/.zsh/cache/
 
+# AI
+.claude
 .serena
