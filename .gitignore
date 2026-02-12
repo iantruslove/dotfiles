@@ -34,3 +34,5 @@ emacs/.emacs.d/url
 xmonad/.xmonad/*.errors
 
 zsh/.zsh/cache/
+
+.serena
