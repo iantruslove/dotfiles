@@ -51,7 +51,14 @@ alias rbt.='rush build --to .'
 
 # Tmux
 alias tls='tmux list-sessions'
-alias trs='tmux command-prompt -I "#S" -p "Rename session:" "rename-session %%"'
+trs() {
+  [ -z "$TMUX" ] && return
+  if [ -n "$1" ]; then
+    tmux rename-session "$1"
+  else
+    tmux command-prompt -I "#S" -p "Rename session:" "rename-session %%"
+  fi
+}
 
 # Whats My IP
 alias wmi='dig +short myip.opendns.com @resolver1.opendns.com'
