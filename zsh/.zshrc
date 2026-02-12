@@ -299,3 +299,11 @@ if [[ -d "$NVM_DIR" ]]; then
 fi
 
 . "$HOME/.local/bin/env"
+
+# pnpm
+export PNPM_HOME="~/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
