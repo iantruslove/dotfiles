@@ -1,0 +1,83 @@
+# -*- mode: sh -*-
+
+# Stow and Dotfiles directories
+export STOW_DIR=$HOME/.dotfiles
+export DOTFILES=$STOW_DIR
+
+# Setup Emacs Shell
+export ESHELL=/bin/bash
+
+# Language
+[[ -z "$LANG" ]] && export LANG='en_US.UTF-8'
+[[ -z "$LC_ALL" ]] && export LC_ALL='en_US.UTF-8'
+
+# Emacs Info Files
+[ -d "$HOME/.info" ] && export INFOPATH="$HOME/.info"
+
+# Tex Inputs
+[ -d "$HOME/.tex" ] && export TEXINPUTS="$HOME/.tex//:"
+
+# Browser
+[[ "$OSTYPE" == darwin* ]] && export BROWSER='open'
+
+# Path setup: include home bin dir and brew directories
+PATH="$PATH:$HOME/bin"
+for d in /opt/homebrew/sbin /usr/local/sbin /opt/homebrew/bin /opt/openssl/bin /usr/local/bin ; do
+    if [[ -d $d ]] ; then
+        PATH="$d:$PATH"
+    fi
+done
+export PATH
+
+# Less
+export LESS="-R -J -f -i -M -Q -S"
+
+# Directory Colors
+export CLICOLOR=true
+
+if type dircolors >/dev/null 2>&1 && [ -f ~/.dircolors ]; then
+    eval $(dircolors ~/.dircolors)
+elif type dircolors >/dev/null 2>&1; then
+    eval $(dircolors)
+else
+    export LS_COLORS=ExfxcxdxBxegedabagacad
+fi
+
+# Grep Colors
+export GREP_COLOR='37;45'           # BSD.
+export GREP_COLORS="mt=$GREP_COLOR" # GNU.
+
+# Editors
+# export EDITOR='emacs'
+# export VISUAL='emacs'
+export EDITOR='emacsclient -t'
+export VISUAL='emacsclient -t'
+#export VISUAL='emacsclient -c -n'
+
+export PAGER='less'
+
+# Rust
+[ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
+
+# Node
+if command -v npm >/dev/null 2>&1; then
+    export NODE_PATH=$NODE_PATH:$(npm root -g)
+fi
+
+# Python
+if [ -x $HOME/.pyenv/bin/pyenv ] ; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+fi
+
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init --path)"
+
+    if command -v pyenv-virtualenv-init > /dev/null; then
+        eval "$(pyenv virtualenv-init -)";
+    fi
+fi
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+
+# Secrets (API tokens, etc.) - stored in uncommitted .env.secrets
+[ -f "$DOTFILES/main/.env.secrets.sh" ] && source "$DOTFILES/main/.env.secrets.sh"
