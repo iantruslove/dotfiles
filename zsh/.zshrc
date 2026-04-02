@@ -269,9 +269,6 @@ autoload -Uz compinit && compinit
 # aws-cli completions:
 (( $+commands[aws_completer] )) && complete -C "$(command -v aws_completer)" aws
 
-# Pipenv
-(( $+commands[pipenv] )) && eval "$(_PIPENV_COMPLETE=zsh_source pipenv)"
-
 ################################################################################
 # NVM
 
