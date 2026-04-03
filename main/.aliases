@@ -1,19 +1,7 @@
 # -*- mode: sh -*-
 
-# Sudo
-alias _='sudo'
-alias please='sudo'
-
 # Emacsclient
-alias e='emacsclient -c -n'
-alias et='emacsclient -t'
-
-# No Vi
-alias vi='vim'
-alias e='emacsclient -a vim -t'
-
-# No Vim (use \vim to get back to it)
-alias vim=e
+alias e='emacsclient -t -a ""'
 
 # Make sure ls has colors and defaults to -h
 if ls --color -d . >/dev/null 2>&1; then
@@ -47,7 +35,7 @@ alias gpr='git pull --rebase'  # Note possible collision with `gpr` command...
 alias gf='git fetch -a'
 
 # Rush
-alias rbt.='rush build --to .'
+alias rbt='rush build --to .'
 
 # Tmux
 alias tls='tmux list-sessions'
