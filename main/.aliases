@@ -47,6 +47,14 @@ trs() {
     tmux command-prompt -I "#S" -p "Rename session:" "rename-session %%"
   fi
 }
+trw() {
+    [ -z "$TMUX" ] && return
+    if [ -n "$1" ]; then
+        tmux rename-window "$1"
+    else
+        tmux command-prompt -I "#W" -p "Rename window:" "rename-window %%"
+    fi
+}
 
 # Whats My IP
 alias wmi='dig +short myip.opendns.com @resolver1.opendns.com'
