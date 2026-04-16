@@ -116,3 +116,39 @@ fi
 
 # Emacs
 alias pemacs='emacs -Q -l ~/.emacs.d/profile-dotemacs.el --eval "(setq profile-dotemacs-file (setq load-file-name \"~/.emacs.d/init.el\"))" -f profile-dotemacs'
+
+alias nuc='mosh nuc'
+
+nuctunnel() {
+    if [ -z "$1" ]; then
+        echo "Usage: nuctunnel <port>" >&2
+        return 1
+    fi
+    local port="$1"
+
+    ssh -N -o ExitOnForwardFailure=yes -o ConnectTimeout=5 \
+        -L "${port}:localhost:${port}" nuc &
+    local ssh_pid=$!
+
+    local tries=0
+    while ! nc -z localhost "$port" 2>/dev/null; do
+        if ! kill -0 "$ssh_pid" 2>/dev/null; then
+            wait "$ssh_pid" 2>/dev/null
+            echo "Error: failed to establish tunnel to nuc" >&2
+            return 1
+        fi
+        tries=$((tries + 1))
+        if [ "$tries" -gt 100 ]; then
+            kill "$ssh_pid" 2>/dev/null
+            wait "$ssh_pid" 2>/dev/null
+            echo "Error: timeout waiting for tunnel on port ${port}" >&2
+            return 1
+        fi
+        sleep 0.1
+    done
+
+    echo "Ready..."
+    trap 'kill "$ssh_pid" 2>/dev/null' INT
+    wait "$ssh_pid"
+    trap - INT
+}
