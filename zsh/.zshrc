@@ -1,6 +1,9 @@
 # .zshrc - Sourced for interactive shells.
 # Configure shell options, keybindings, aliases, plugins, prompt, history, and completions.
 
+# set -e
+# set -x
+
 ## Options section
 setopt correct                                                  # Auto correct mistakes
 setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
@@ -297,7 +300,7 @@ if [[ -d "$NVM_DIR" ]]; then
     unset cmd NODE_GLOBALS
 fi
 
-. "$HOME/.local/bin/env"
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 
 # pnpm
 export PNPM_HOME="~/.local/share/pnpm"
