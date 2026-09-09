@@ -72,3 +72,5 @@ Desktop.ini
 .lein-repl-history
 .lein-failures
 .nrepl-port
+
+**/.claude/settings.local.json
