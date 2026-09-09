@@ -307,3 +307,7 @@ esac
 
 # opencode
 export PATH=/home/ian/.opencode/bin:$PATH
+
+# NemoClaw PATH setup
+export PATH="/home/ian/.local/bin:$PATH"
+# end NemoClaw PATH setup
