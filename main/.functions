@@ -18,36 +18,29 @@ function set-title {
 
 ################################################################################
 # fix-agent - from Joe's https://gist.github.com/joegallo/84df64e178a5ba25899b
-function agent-path
-{
-    case $(uname) in
-        Darwin)
-            echo "*launch*/Listeners"
-            ;;
-        *)
-            echo "*ssh*/agent\.*"
-            ;;
-    esac
-}
-
+# Re-point a stale shell (tmux, long-lived ssh session) at the newest live agent
+# socket. Looks in /tmp (bare ssh-agent / forwarded agents) and in
+# $XDG_RUNTIME_DIR (systemd + gnome-keyring on modern Linux).
 function agent-sockets
 {
-    find -L /tmp -uid $UID -path $(agent-path) -type s 2> /dev/null
+    find -L /tmp "${XDG_RUNTIME_DIR:-/run/user/$UID}" -maxdepth 3 -uid $UID -type s \
+        \( -path "*ssh*/agent.*" -o -path "*/gcr/ssh" -o -path "*launch*/Listeners" \) 2>/dev/null
 }
 
 function find-agent
 {
-    if [ -z "$(agent-sockets)" ]; then
-        echo "no agent found"
+    local socks; socks=$(agent-sockets)
+    if [[ -z "$socks" ]]; then
+        echo "no agent found" >&2
         return 1
-    else
-        /bin/ls -t1 $(agent-sockets) | head -1
     fi
+    printf "%s\n" "$socks" | xargs -d "\n" /bin/ls -t1 | head -1
 }
 
 function fix-agent
 {
-    export SSH_AUTH_SOCK="$(find-agent)"
+    local sock; sock="$(find-agent)" || return 1
+    export SSH_AUTH_SOCK="$sock"
     ssh-add -l > /dev/null
 }
 

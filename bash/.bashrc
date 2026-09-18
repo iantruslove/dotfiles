@@ -132,19 +132,18 @@ function __prompt {
 #export PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 export PROMPT_COMMAND=__prompt
 
-# Keychains and SSH agents:
-#if ! pgrep -u "$USER" ssh-agent > /dev/null; then
-    if [[ -x $(which keychain) ]]; then
+# SSH agent: on a systemd desktop the session already exports SSH_AUTH_SOCK
+# (gnome-keyring's gcr-ssh-agent, which auto-loads ~/.ssh keys at login).
+# Only fall back if nothing usable is set; never spawn a second agent blindly.
+if [[ -z "$SSH_AUTH_SOCK" || ! -S "$SSH_AUTH_SOCK" ]]; then
+    if [[ -S "${XDG_RUNTIME_DIR}/gcr/ssh" ]]; then
+        export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gcr/ssh"
+    elif command -v keychain > /dev/null; then
         # Keychain is wicked smaht, but not necessarily installed
-        eval `keychain --eval --agents ssh 2>/dev/null`
-    else
-        eval `ssh-agent` > /dev/null
+        eval "$(keychain --eval --agents ssh 2>/dev/null)"
+    elif ! fix-agent 2>/dev/null; then
+        eval "$(ssh-agent)" > /dev/null
     fi
-#fi
-
-# Fix ssh-agent
-if [[ ! "$SSH_AUTH_SOCK" ]]; then
-    fix-agent
 fi
 
 for f in ~/.site/*; do

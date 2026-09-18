@@ -212,15 +212,17 @@ setopt HIST_REDUCE_BLANKS
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
-# SSH agent:
-# On Linux with systemd, use the user-managed socket if present.
-# Otherwise fall back to keychain (if installed) or a plain ssh-agent.
-if [[ -S "${XDG_RUNTIME_DIR}/ssh-agent.socket" ]]; then
-    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
-elif [[ -x $(which keychain) ]]; then
-    eval `keychain --eval --agents ssh 2>/dev/null`
-else
-    eval `ssh-agent` > /dev/null
+# SSH agent: on a systemd desktop the session already exports SSH_AUTH_SOCK
+# (gnome-keyring's gcr-ssh-agent, which auto-loads ~/.ssh keys at login).
+# Only fall back if nothing usable is set.
+if [[ -z "$SSH_AUTH_SOCK" || ! -S "$SSH_AUTH_SOCK" ]]; then
+    if [[ -S "${XDG_RUNTIME_DIR}/gcr/ssh" ]]; then
+        export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gcr/ssh"
+    elif (( $+commands[keychain] )); then
+        eval "$(keychain --eval --agents ssh 2>/dev/null)"
+    else
+        eval "$(ssh-agent)" > /dev/null
+    fi
 fi
 
 # # Load local plugins
