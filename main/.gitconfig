@@ -37,9 +37,6 @@
     diff = false
     show-branch = true
 
-[url "ssh://git@github.com/"]
-    insteadOf = https://github.com/
-
 [alias]
     st = status
     ci = commit
