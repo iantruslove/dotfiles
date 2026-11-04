@@ -18,12 +18,14 @@ esac
 
 # First install brew on a mac
 if [ `uname` = "Darwin" ]; then
-  which brew &>/dev/null || \
-    /usr/bin/ruby -e \
-    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  command -v brew >/dev/null 2>&1 || \
+    /bin/bash -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-  # Install git and stow
-  brew install git stow
+  # Install git and stow (skipping any already present, to avoid brew warnings)
+  for pkg in git stow; do
+    brew list --formula "$pkg" >/dev/null 2>&1 || brew install "$pkg"
+  done
 elif [ -f "/etc/arch-release" ]; then
   sudo pacman -S --noconfirm git stow
 elif [ `uname` = "FreeBSD" ]; then
@@ -34,7 +36,7 @@ fi
 if [ -d ~/.dotfiles ]; then
   PREV=`pwd`
   cd ~/.dotfiles
-  git pull
+  git pull --quiet
   cd $PREV
 else
   git clone git@github.com:iantruslove/dotfiles.git ~/.dotfiles
@@ -46,5 +48,5 @@ fi
 # Run the update
 if [ "$1" = "mac" ]; then
     # TODO: Uncomment ### ~/bin/update
-    echo "TODO"
+    :
 fi
