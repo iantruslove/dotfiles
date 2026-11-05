@@ -56,6 +56,11 @@ if have tmux && [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
   echo "Installed tpm; press <prefix> I inside tmux to install plugins."
 fi
 
+if have emacs && [ ! -e "$HOME/.emacs.d" ]; then
+  git clone --quiet --depth 1 https://github.com/syl20bnr/spacemacs "$HOME/.emacs.d"
+  echo "Installed Spacemacs; the first Emacs start installs its packages."
+fi
+
 echo
 echo "Done. Manual follow-ups (see README):"
 have zsh || echo "  - install zsh"

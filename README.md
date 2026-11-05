@@ -62,6 +62,24 @@ Things specific to one machine stay out of git:
 - **`main/.env.secrets`, `main/.env.secrets.sh`**: sourced by `.env.sh` if present.
   Both are gitignored.
 
+### Spacemacs
+
+`~/.emacs.d` is a checkout of [Spacemacs](https://www.spacemacs.org) (bootstrap
+clones it when emacs is installed). The config is `~/.spacemacs.d/init.el`; make
+sure there is no `~/.spacemacs`, which would take precedence.
+
+Per-machine settings go in `~/.spacemacs.d/local.el`, loaded at the end of
+`dotspacemacs/user-config`. For example:
+
+```elisp
+(setq org-directory "~/Dropbox/org"
+      ian/org-agenda-journal-months 3)
+(add-to-list 'ian/org-agenda-base-files "client-x.org")
+```
+
+GUI Emacs gets its environment from `~/.spacemacs.d/.spacemacs.env` (also
+per-machine; regenerate it from a shell with `SPC f e E`).
+
 ### Git identities
 
 `.gitconfig` sets `user.useConfigOnly`, so each repo has to choose an identity.

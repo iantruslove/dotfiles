@@ -40,6 +40,11 @@ for package in $PACKAGES; do
 done
 
 [ -d "$HOME/.ssh" ] && chmod 700 "$HOME/.ssh"
+
+# Spacemacs prefers ~/.spacemacs over ~/.spacemacs.d/init.el
+if [ -e "$HOME/.spacemacs" ] || [ -L "$HOME/.spacemacs" ]; then
+  echo "WARNING: remove ~/.spacemacs so Spacemacs uses ~/.spacemacs.d/init.el"
+fi
 [ -d "$backup_dir" ] && echo "Conflicting files were moved to $backup_dir"
 
 exit $failed
