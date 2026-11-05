@@ -39,11 +39,10 @@ This function should only modify configuration layer settings."
              python-backend 'lsp
              python-lsp-server 'pyright  ;; The key binding SPC m = invokes the selected formatter on the current buffer when in non LSP python mode otherwise SPC m == is used.
 
-             python-pipenv-activate t
+             python-enable-tools '(pip uv)  ;; a project's .venv is activated on visit
 
              python-formatter 'ruff
              python-format-on-save t
-             ;; SPC m v p a   activate a pipenv environment with pipenv
              )
      sql
      csv
@@ -90,10 +89,8 @@ This function should only modify configuration layer settings."
    ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages
    '(ob-http
-     keychain-environment
      highlight-indent-guides
      gptel
-     eat
 
      clipetty
 
@@ -965,7 +962,7 @@ dump."
                               ("BLOCKED" . ?b)
                               ("LATER" . ?l)
                               ("PERSONAL" . ?P)
-                              ("WORK" . ?W)
+                              ("WORK" . ?w)
                               ("ORG" . ?o)
                               ("crypt" . ?e)
                               ("NOTE" . ?n)
@@ -1238,7 +1235,6 @@ dump."
 
   (unless window-system
     (xterm-mouse-mode t)
-    (defun track-mouse (e))
     (global-set-key [mouse-4] (lambda ()
                                 (interactive)
                                 (scroll-down 1)))
