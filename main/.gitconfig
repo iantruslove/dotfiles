@@ -15,19 +15,9 @@
     #      gpgsign = true
     #
 
-[push]
-    default = simple
-
 [core]
     excludesfile = ~/.gitignore_global
     editor = emacsclient -nw -a vim -t
-
-[color]
-    ui = auto
-    interactive = auto
-    diff = auto
-    branch = auto
-    status = auto
 
 [log]
     decorate = short
