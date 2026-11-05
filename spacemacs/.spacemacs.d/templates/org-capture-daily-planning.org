@@ -1,0 +1,16 @@
+* Daily Planning                                        :planning:DailyGoals:
+:LOGBOOK:
+:END:
+%?
+
+* Yesterday's Best and Worst
+- Worst
+  -
+- Best
+  -
+
+* TODOs for today [0/1]                                          :DailyGoals:
+/Remember: work towards quarterly rocks, L10 weekly todos, and my weekly goals/
+/Work should be clocked in project items elsewhere: what are today's outcomes?/
+
+- [ ]
