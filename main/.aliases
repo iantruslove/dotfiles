@@ -17,9 +17,6 @@ else
     alias l='ls -lah'
 fi
 
-# Jira
-alias j='open https://improbableio.atlassian.net/browse/$(git rev-parse --abbrev-ref HEAD)'
-
 # Docker
 alias dr='docker run -it --rm'
 alias drs='docker_run_shell'  # see .functions
@@ -116,9 +113,6 @@ if ! command -v pbpaste >/dev/null 2>&1; then
         printf '\033]52;c;?\a'
     }
 fi
-
-# Emacs
-alias pemacs='emacs -Q -l ~/.emacs.d/profile-dotemacs.el --eval "(setq profile-dotemacs-file (setq load-file-name \"~/.emacs.d/init.el\"))" -f profile-dotemacs'
 
 # GAM (Google Workspace admin), if installed in ~/bin/gam7
 [ -x "$HOME/bin/gam7/gam" ] && alias gam="$HOME/bin/gam7/gam"

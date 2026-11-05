@@ -62,28 +62,6 @@ function ensure-ssh-agent
 
 ################################################################################
 
-aws_email=__________________  # (your email address)
-iam_id=____________  # (12 digits)
-
-# Sets AWS access ID and secret access key environment variables using an MFA OTP.
-# Usage:
-#   mfa <mfa-code>
-function mfa () {
-    unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-    CREDS=`aws sts get-session-token --serial-number arn:aws:iam::$iam_id:mfa/$aws_email --token-code $1`
-
-    KEY=`echo $CREDS | jq -r .Credentials.AccessKeyId`
-    SECRET=`echo $CREDS | jq -r .Credentials.SecretAccessKey`
-    SESSION=`echo $CREDS | jq -r .Credentials.SessionToken`
-
-    export AWS_ACCESS_KEY_ID=$KEY
-    export AWS_SECRET_ACCESS_KEY=$SECRET
-    export AWS_SESSION_TOKEN=$SESSION
-}
-
-################################################################################
-
 # Sources VAR=VALUE lines in a docker-compose .env file as exported
 # shell environment variables
 function source_env

@@ -11,7 +11,6 @@ main/.site/*
 
 # Emacs Ignores
 emacs/.emacs.d/.cache
-emacs/.emacs.d/.cask
 emacs/.emacs.d/.lsp-session-v1
 emacs/.emacs.d/.mc-lists.el
 emacs/.emacs.d/bookmarks
@@ -30,9 +29,6 @@ emacs/.emacs.d/smex-items
 emacs/.emacs.d/transient
 emacs/.emacs.d/url
 *.elc
-
-# XMonad Ignores
-xmonad/.xmonad/*.errors
 
 zsh/.zsh/cache/
 
