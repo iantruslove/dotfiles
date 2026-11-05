@@ -54,10 +54,8 @@ This function should only modify configuration layer settings."
                  )
      javascript
      auto-completion
-     ;; better-defaults
      emacs-lisp
      git
-     ;; helm
      html
      compleseus
      (ibuffer :variables ibuffer-group-buffers-by 'projects)
@@ -67,25 +65,15 @@ This function should only modify configuration layer settings."
      org
 
      (claude-code :variables
-                  ;;claude-code-ide-window-side 'right
-                  ;;claude-code-ide-window-width 88
                   claude-code-ide-use-side-window nil
                   claude-code-ide-terminal-backend 'vterm ;; 'eat
                   )
 
-     ;; ;; See https://github.com/arnm/mermaid-layer
-     ;; ;; Need to clone the repo into ~/.emacs.d/private/
-     ;; mermaid
-
      (php :variables php-backend 'lsp)
 
      (shell :variables shell-default-shell 'vterm)
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
 
      spacemacs-editing
-     ;; spell-checking
      syntax-checking
      version-control
      terraform
@@ -286,17 +274,9 @@ It should only modify the values of Spacemacs settings."
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(wilson
-
                          modus-operandi
                          spacemacs-light
-
-                         odersky
-
-                         ;;spacemacs-dark
-                         ;;gruvbox
-                         ;;gruvbox-light-soft
-                         ;;sunny-day
-                         )
+                         odersky)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
@@ -314,12 +294,7 @@ It should only modify the values of Spacemacs settings."
    ;; Default font or prioritized list of fonts. The `:size' can be specified as
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent. (default 10.0)
-   dotspacemacs-default-font '(;;"Inconsolata for Powerline" :size 12.0 :weight normal :width normal
-                               ;;"Source Code Pro for Powerline" :size 12.0 :weight normal :width normal
-                               ;;"Roboto Mono for Powerline" :size 12.0 :weight normal :width normal
-                               ;;"Fira Mono for Powerline" :size 12.0 :weight normal :width normal
-                               "Roboto Mono Light for Powerline" :size 12.0 :weight normal :width normal
-                               )
+   dotspacemacs-default-font '("Roboto Mono Light for Powerline" :size 12.0 :weight normal :width normal)
 
    ;; Default icons font, it can be `all-the-icons' or `nerd-icons'.
    dotspacemacs-default-icons-font 'all-the-icons
@@ -687,14 +662,6 @@ dump."
       (require 'smartparens-config))))
 
 
-(defun ian/config-snippets ()
-  ;; ;; This following statement causes warnings
-  ;; (setq-default dotspacemacs-configuration-layers
-  ;;               '((auto-completion :variables
-  ;;                                  auto-completion-enable-snippets-in-popup t)))
-  )
-
-
 (defun ian/config-org-agenda ()
   (setq org-agenda-dim-blocked-tasks nil
         org-agenda-compact-blocks t)
@@ -737,16 +704,7 @@ dump."
   (setq org-agenda-custom-commands
         (quote (("G" "Goal View"
 
-                 (;; (agenda ""
-                  ;;         ((org-agenda-span 1)
-                  ;;          (org-agenda-time-grid nil)
-                  ;;          (org-agenda-show-all-dates nil)
-                  ;;          (org-agenda-skip-function
-                  ;;           '(my/org-agenda-skip-without-match "+projects"))
-                  ;;          (org-agenda-entry-types '(:deadline)) ;; this entry excludes :scheduled
-                  ;;          (org-deadline-warning-days 1000) ))
-
-                  (tags-todo "TODO=\"NEXT\"+goals+current|TODO=\"TODO\"+goals+current"
+                 ((tags-todo "TODO=\"NEXT\"+goals+current|TODO=\"TODO\"+goals+current"
                              ((org-agenda-overriding-header "Active Goals")
                               (org-agenda-hide-tags-regexp "goal\\|current\\|scope_")
                               (org-agenda-sorting-strategy
@@ -755,15 +713,10 @@ dump."
                   (tags-todo "TODO=\"NEXT\"+projects+strategic|TODO=\"TODO\"+projects+strategic"
                              ((org-agenda-overriding-header "Strategic Projects (goal-supporting)")
                               (org-agenda-hide-tags-regexp "projects\\|strategic")
-                              ;;(org-agenda-skip-function 'bh/skip-non-projects)
                               (org-tags-match-list-sublevels 'indented)
                               (org-agenda-sorting-strategy
                                '(deadline-down category-keep))))
                   ))
-
-                ;; ("N" "Notes" tags "NOTE"
-                ;;  ((org-agenda-overriding-header "Notes")
-                ;;   (org-tags-match-list-sublevels t)))
 
                 ("D" "Decisions" tags "DECISION"
                  ((org-agenda-overriding-header "Decisions")
@@ -772,11 +725,6 @@ dump."
                 ("T" "Tech Debt" tags "TECH_DEBT"
                  ((org-agenda-overriding-header "Tech Debt")
                   (org-tags-match-list-sublevels t)))
-
-                ;; ("h" "Habits" tags-todo "STYLE=\"habit\""
-                ;;  ((org-agenda-overriding-header "Habits")
-                ;;   (org-agenda-sorting-strategy
-                ;;    '(todo-state-down effort-up category-keep))))
 
                 ("h" "Home" tags-todo "#home"
                  ((org-agenda-overriding-header "Home Tasks")
@@ -811,9 +759,6 @@ dump."
                                                                         ""
                                                                       " (including BLOCKED and SCHEDULED tasks)")))
                               (org-agenda-skip-function 'bh/skip-project-tasks)
-                              ;; (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                              ;; (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-                              ;; (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
                               (org-agenda-sorting-strategy
                                '(priority-down todo-state-down effort-up category-keep))))
 
@@ -824,13 +769,6 @@ dump."
                                '((tags . "%(ian/org-delegated-prefix)")))
                               (org-agenda-sorting-strategy
                                '(deadline-up priority-down category-keep))))
-
-                  ;; (tags-todo "-#home+TODO=\"DELEGATED\""
-                  ;;            ((org-agenda-overriding-header "Delegated Tasks")
-                  ;;             (org-tags-match-list-sublevels 'indented)
-                  ;;             (org-agenda-sorting-strategy
-                  ;;              '(category-keep))))
-
 
                   (tags-todo "-#home+TODO=\"TODO\"+{^@.*}|-#home+TODO=\"NEXT\"+{^@.*}"
                              ((org-agenda-overriding-header "Tasks to Delegate")
@@ -863,13 +801,7 @@ dump."
                   (tags "REFILE"
                         ((org-agenda-overriding-header "Tasks to Refile")
                          (org-agenda-hide-tags-regexp "REFILE")
-                         (org-tags-match-list-sublevels t)))
-
-                  ;; (tags "-REFILE/"
-                  ;;       ((org-agenda-overriding-header "Tasks to Archive")
-                  ;;        (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
-                  ;;        (org-tags-match-list-sublevels nil)))
-                  )
+                         (org-tags-match-list-sublevels t))))
                  nil)
 
                 ("d" "Delegation Dashboard"
@@ -889,20 +821,6 @@ dump."
 
                 ("P" "Projects"
                  ((agenda "" nil)
-
-                  ;; (tags-todo "-#home-CANCELLED+TODO=\"NEXT\"-{^@.*}|-CANCELLED+PRIORITY=\"A\"-{^@.*}"
-                  ;;            ((org-agenda-overriding-header (concat "Rocks"
-                  ;;                                                   (if bh/hide-scheduled-and-waiting-next-tasks
-                  ;;                                                       ""
-                  ;;                                                     " (including BLOCKED and SCHEDULED tasks)")))
-                  ;;             (org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
-                  ;;             (org-agenda-hide-tags-regexp "projects")
-                  ;;             (org-tags-match-list-sublevels t)
-                  ;;             (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                  ;;             (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-                  ;;             (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
-                  ;;             (org-agenda-sorting-strategy
-                  ;;              '(todo-state-down priority-down effort-up category-keep))))
 
                   (tags-todo "-#home-LATER-CANCELLED+{^R_202.*}"
                              ((org-agenda-overriding-header "Rocks")
@@ -1080,10 +998,6 @@ dump."
                  "* TODO %?\n%U\n%a\n"
                  :clock-in t :clock-resume t)
 
-                ;; ("d" "Record a delegated task" entry (file+datetree journal)
-                ;;  "* DELEGATED @%\\2 %^{What}   \t:@%^{Who}:\n%U\n%l\n"
-                ;;  :clock-in t :clock-resume t :immediate-finish t :empty-lines 1)
-
                 ("D" "A task that needs delegating later" entry (file+datetree journal)
                  "* TODO %^{What}   \t:@%^{Who}:\n%U\n%l\n"
                  :clock-in t :clock-resume t :immediate-finish t :empty-lines 1)
@@ -1144,7 +1058,6 @@ dump."
 (defun ian/config-org-babel ()
 
   (require 'ob-http)
-  ;; (use-package ob-mermaid)
 
   (setq org-babel-sh-command "bash"
         org-confirm-babel-evaluate nil
@@ -1152,7 +1065,6 @@ dump."
         org-babel-default-header-args:sh '((:results . "verbatim drawer")))
 
   (setq org-src-tab-acts-natively nil)
-  (setq ob-mermaid-cli-path "/Users/iantruslove/.nvm/versions/node/v20.16.0/bin/mmdc")
 
   (org-babel-do-load-languages
    (quote org-babel-load-languages)
@@ -1161,7 +1073,6 @@ dump."
            (emacs-lisp . t)
            (http . t)  ;; See https://github.com/zweifisch/ob-http
            (js . t)
-           ;;(mermaid . t)
            (org . t)
            (plantuml . t)
            (python . t)
@@ -1197,7 +1108,6 @@ dump."
         org-adapt-indentation t
 
         org-edit-src-content-indentation 0
-        org-src-tab-acts-natively t
         org-src-preserve-indentation nil
 
         org-startup-folded 'fold
@@ -1225,11 +1135,7 @@ dump."
         org-outline-path-complete-in-steps nil
         ;; Allow refile to create parent tasks with confirmation
         org-refile-allow-creating-parent-nodes (quote confirm)
-        org-refile-target-verify-function 'bh/verify-refile-target)
-
-  ;; This seems to be causing trouble...
-  ;; (run-at-time "00:59" 600 'org-save-all-org-buffers)
-  )
+        org-refile-target-verify-function 'bh/verify-refile-target))
 
 
 (defun ian/config-org ()
@@ -1239,7 +1145,6 @@ dump."
     (require 'org-lib)
     (require 'org-clocktable-by-tag)
 
-    ;;(defvar organizer (concat org-directory "organizer.org"))
     (defvar journal (concat org-directory "/journal/journal-" (format-time-string "%Y-%m") ".org"))
     (defvar refile (concat org-directory "/refile.org"))
 
@@ -1281,7 +1186,6 @@ dump."
       (scroll-bar-mode -1))
 
   (unless window-system
-    (require 'mouse)
     (xterm-mouse-mode t)
     (defun track-mouse (e))
     (global-set-key [mouse-4] (lambda ()
@@ -1289,8 +1193,7 @@ dump."
                                 (scroll-down 1)))
     (global-set-key [mouse-5] (lambda ()
                                 (interactive)
-                                (scroll-up 1)))
-    (setq mouse-sel-mode t))
+                                (scroll-up 1))))
 
   ;; Set modifier keys on mac
   (if (eq system-type 'darwin)
@@ -1345,7 +1248,6 @@ before packages are loaded."
   (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode)
 
   (with-eval-after-load 'magit-mode
-    ;;(global-set-key (kbd "C-c g") #'magit-status) ;; I should learn the spacemacs way
     (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
     (setq-default magit-process-popup-time 10
                   magit-diff-refine-hunk nil
@@ -1368,32 +1270,13 @@ before packages are loaded."
   (ian/config-os)
   (ian/config-editor)
   (ian/config-smartparens)
-  (ian/config-snippets)
   (ian/config-highlight-symbol)
   (ian/config-org)
 
   ;; Key bindings
-  ;; (global-set-key (kbd "C-l") 'counsel-up-directory)
   (spacemacs/set-leader-keys "fP" 'ian/find-file-at-point-immediate)
 
-  ;; Helm's minibuffer actions popup stopped working, with the error "cannot
-  ;; split window or parent of side window". This is a workaround:
-  ;;(setq-default helm-display-function 'helm-default-display-buffer)
-
-  ;; ;; Copilot
-  ;; (with-eval-after-load 'company
-  ;;   ;; disable inline previews
-  ;;   (delq 'company-preview-if-just-one-frontend company-frontends))
-  ;; (with-eval-after-load 'copilot
-  ;;   (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  ;;   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
-  ;;   (define-key copilot-completion-map (kbd "C-TAB") 'copilot-accept-completion-by-word)
-  ;;   (define-key copilot-completion-map (kbd "C-<tab>") 'copilot-accept-completion-by-word))
-
-  ;; (add-hook 'prog-mode-hook 'copilot-mode)
-
-  (require 'gptel)
-  )
+  (require 'gptel))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
