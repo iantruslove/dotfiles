@@ -25,12 +25,7 @@ config.window_frame = {
   border_top_color = '#444444',
 }
 
--- config.color_scheme = 'Selenized Dark (Gogh)'
--- config.color_scheme = 'Modus Vivendi (Gogh)'
--- config.color_scheme = 'Monokai Soda'
 config.color_scheme = 'Sequoia Moonlight'
--- config.color_scheme = 'Tomorrow Night Blue'
--- config.color_scheme = 'tlh (terminal.sexy)'
 
 config.keys = {
   -- Fix shift-enter for claude code
@@ -47,22 +42,5 @@ config.keys = {
   },
 
 }
-
--- Switch theme based on ssh
-wezterm.on(
-  'update-right-status',
-  function(window, pane)
-    local process = pane:get_foreground_process_name() or ''
-    local title = pane:get_title() or ''
-
-    if title:find('ian@nuc') then
-      window:set_config_overrides({
-          color_scheme = 'Sequoia Moonlight'
-      })
-    else
-      window:set_config_overrides({
-      })
-    end
-end)
 
 return config

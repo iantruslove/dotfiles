@@ -1,9 +1,6 @@
 # .zshrc - Sourced for interactive shells.
 # Configure shell options, keybindings, aliases, plugins, prompt, history, and completions.
 
-# set -e
-# set -x
-
 ## Options section
 setopt correct                                                  # Auto correct mistakes
 setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
@@ -64,7 +61,7 @@ bindkey '^[[Z' undo                                             # Shift+tab undo
 
 ################################################################################
 # Theming section
-autoload -U colors zcalc
+autoload -U colors
 colors
 
 precmd() {
@@ -74,16 +71,16 @@ precmd() {
 # enable substitution for prompt
 setopt prompt_subst
 
-# Prompt (on left side) similar to default bash prompt, or redhat zsh prompt with colors
- #PROMPT="%(!.%{$fg[red]%}[%n@%m %1~]%{$reset_color%}# .%{$fg[green]%}[%n@%m %1~]%{$reset_color%}$ "
-# Maia prompt
-PROMPT="%B%{$fg[cyan]%}%(4~|%-1~/.../%2~|%~)%u%b >%{$fg[cyan]%}>%B%(?.%{$fg[cyan]%}.%{$fg[red]%})>%{$reset_color%}%b " # Print some system information when the shell is first started
-# Print a greeting message when shell is started
-if type lsb_release >/dev/null 2>&1; then
-    echo $USER@$HOST  $(uname -srm) $(lsb_release -rcs)
-else
-    echo $USER@$HOST  $(uname -srm)
-fi
+# Left prompt: shortened path and >>> (last > red if the previous command failed)
+PROMPT="%B%{$fg[cyan]%}%(4~|%-1~/.../%2~|%~)%u%b >%{$fg[cyan]%}>%B%(?.%{$fg[cyan]%}.%{$fg[red]%})>%{$reset_color%}%b "
+
+# Greeting: which machine is this?
+() {
+    local os
+    [[ -r /etc/os-release ]] && os=$(source /etc/os-release && echo $PRETTY_NAME)
+    echo "$USER@$HOST $(uname -srm)${os:+ ($os)}"
+}
+
 ## Prompt on right side:
 #  - in a git repo: branch plus state markers (one `git status` call)
 #  - otherwise: exit status of the previous command, if it failed
@@ -183,38 +180,13 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 # SSH agent (see .functions)
 ensure-ssh-agent
 
-# # Load local plugins
-# for script in ~/.zsh/**/*.zsh; do
-#   source $script
-# done
-
-
-
-
-### The following pipenv stuff is replaced with a zsh plugin
-# # Automatically use pipenvs
-# function auto_pipenv_shell {
-#     if [ ! -n "${PIPENV_ACTIVE+1}" ] ; then
-#         if [ -f "Pipfile" ] ; then
-#             if command -v pipenv &> /dev/null ; then
-#                 pipenv shell
-#             fi
-#         fi
-#     fi
-# }
-# function cd {
-#     builtin cd "$@"
-#     auto_pipenv_shell
-# }
-
 ################################################################################
 # Completions
 
 # Homebrew completions (HOMEBREW_PREFIX is set in .env.sh)
 [[ -n "$HOMEBREW_PREFIX" ]] && fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" $fpath)
 
-# Having loaded the zsh-completions plugin and possibly others during
-# the starup sequence, reload completion backends:
+# Initialise completion (after plugins have added to fpath)
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
 

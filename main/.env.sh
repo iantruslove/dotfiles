@@ -86,11 +86,8 @@ export GREP_COLORS='mt=37;45'                         # GNU
 [[ "$OSTYPE" == darwin* ]] && export GREP_COLOR='37;45' # BSD (GNU grep warns if set)
 
 # Editors
-# export EDITOR='emacs'
-# export VISUAL='emacs'
 export EDITOR='emacsclient -t'
 export VISUAL='emacsclient -t'
-#export VISUAL='emacsclient -c -n'
 
 export PAGER='less'
 
