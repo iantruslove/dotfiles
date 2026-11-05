@@ -1,10 +1,32 @@
-#!/usr/bin/env zsh
+#!/bin/sh
+# Update OS and package-manager packages on this machine.
+set -e
 
-# Update App Store apps
-sudo softwareupdate -i -a
+case "$(uname)" in
+  Darwin)
+    # macOS software updates
+    sudo softwareupdate -i -a
 
-# Update Homebrew (Cask) & packages
-brew update
-brew upgrade
-brew bundle --file=$DOTFILES/Brewfile
-brew cleanup
+    # Homebrew packages
+    brew update
+    brew upgrade
+    brew bundle --file="${DOTFILES:-$HOME/.dotfiles}/Brewfile"
+    brew cleanup
+    ;;
+  Linux)
+    if command -v apt-get >/dev/null 2>&1; then
+      sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get autoremove -y
+    elif command -v dnf >/dev/null 2>&1; then
+      sudo dnf upgrade -y
+    elif command -v pacman >/dev/null 2>&1; then
+      sudo pacman -Syu --noconfirm
+    else
+      echo "update: no supported package manager found" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    echo "update: unsupported OS $(uname)" >&2
+    exit 1
+    ;;
+esac

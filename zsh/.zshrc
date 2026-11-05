@@ -232,11 +232,6 @@ fi
 #   source $script
 # done
 
-# for f in ~/.site/*; do
-#     if [[ -x "$f" ]] ; then
-#         source $f;
-#     fi
-# done
 
 
 
@@ -301,16 +296,20 @@ fi
 
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 
-# pnpm
-export PNPM_HOME="~/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
+# pnpm (default PNPM_HOME differs by OS)
+if [[ "$OSTYPE" == darwin* ]]; then
+    export PNPM_HOME="$HOME/Library/pnpm"
+else
+    export PNPM_HOME="$HOME/.local/share/pnpm"
+fi
+[[ -d "$PNPM_HOME" ]] && path=("$PNPM_HOME" $path)
 
 # opencode
-export PATH=/home/ian/.opencode/bin:$PATH
+[[ -d "$HOME/.opencode/bin" ]] && path=("$HOME/.opencode/bin" $path)
 
-
-alias gam="/Users/iantruslove/bin/gam7/gam"
+################################################################################
+# Machine-local config: source executable files in ~/.site (not in git)
+for f in ~/.site/*(N); do
+    [[ -x "$f" ]] && source "$f"
+done
+unset f

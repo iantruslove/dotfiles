@@ -34,7 +34,7 @@ function find-agent
         echo "no agent found" >&2
         return 1
     fi
-    printf "%s\n" "$socks" | xargs -d "\n" /bin/ls -t1 | head -1
+    printf "%s\n" "$socks" | tr '\n' '\0' | xargs -0 /bin/ls -t1 | head -1
 }
 
 function fix-agent
