@@ -71,15 +71,21 @@ export PATH
 export LESS="-R"
 
 # Directory Colors
+# GNU ls and zsh completion use LS_COLORS (from dircolors; Homebrew's
+# coreutils calls it gdircolors). BSD ls on macOS uses CLICOLOR/LSCOLORS.
 export CLICOLOR=true
-
-if type dircolors >/dev/null 2>&1 && [ -f ~/.dircolors ]; then
-    eval $(dircolors ~/.dircolors)
-elif type dircolors >/dev/null 2>&1; then
-    eval $(dircolors)
-else
-    export LS_COLORS=ExfxcxdxBxegedabagacad
-fi
+export LSCOLORS=ExfxcxdxBxegedabagacad
+for dc in dircolors gdircolors; do
+    if command -v $dc >/dev/null 2>&1; then
+        if [ -f ~/.dircolors ]; then
+            eval "$($dc -b ~/.dircolors)"
+        else
+            eval "$($dc -b)"
+        fi
+        break
+    fi
+done
+unset dc
 
 # Grep Colors
 export GREP_COLORS='mt=37;45'                         # GNU
