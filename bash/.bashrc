@@ -42,91 +42,21 @@ fi
 # auto correct spelling
 shopt -s cdspell
 
-# Prompt
-
-function git_prompt() {
-  branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-  if [[ $? == 0 ]]; then
-    printf "(%.10s%s) " "$branch" "$([[ -n $(git status -s) ]] && echo " ✗")"
-  fi
+# Prompt: [user@host (over ssh)] path (git branch) [exit status if failed] $
+__git_branch() {
+  local b
+  b=$(git symbolic-ref --short -q HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null) || return
+  printf ' (%s)' "$b"
 }
 
-function status_symbol() {
-  if [[ $1 != 0 ]]; then
-    echo -n "⚡ $1 ⚡ "
-  fi
+__prompt() {
+  local status=$?
+  # $(__git_branch) stays unexpanded here so branch names are never evaluated
+  PS1='${SSH_TTY:+\u@\h }\[\e[36m\]\w\[\e[0m\]\[\e[32m\]$(__git_branch)\[\e[0m\]'
+  (( status )) && PS1+=" \[\e[31m\][$status]\[\e[0m\]"
+  PS1+=' \$ '
 }
-
-function right_prompt() {
-  local str="$(date +'%a %H:%M:%S')"
-
-  if [[ "$SSH_TTY" ]]; then
-    str="$(id -u -n)@$(hostname -s) $str"
-  fi
-
-  tput sc
-  printf "%*s" $COLUMNS "$str"
-  tput rc
-}
-
-function ppwd() {
-  [[ $COLUMNS -lt 60 ]] && return
-
-  local path="$PWD"
-  local path_depth=$(grep -o "/" <<< "$path" | wc -l)
-  local cols=$((($COLUMNS * 2 / 5) - 10))
-
-  for (( i=1; i<=$path_depth; i++))
-  do
-    if [[ ${#path} -gt $cols ]]; then
-      path="$(echo "$path" | sed -e "s;\(/.\)[^/][^/]*;\1;")"
-    fi
-  done
-
-  if [[ ${#path} -gt $cols ]]; then
-    path="«${path:0-$cols}"
-  fi
-
-  echo "$path "
-}
-
-function root_check() {
-  if [[ "$(id -u)" == 0 ]]; then
-    echo "[ROOT] "
-  fi
-}
-
-function __prompt {
-    # solarized colors
-    local BASE03="\[$(tput setaf 8)\]"
-    local BASE02="\[$(tput setaf 0)\]"
-    local BASE01="\[$(tput setaf 10)\]"
-    local BASE00="\[$(tput setaf 11)\]"
-    local BASE0="\[$(tput setaf 12)\]"
-    local BASE1="\[$(tput setaf 14)\]"
-    local BASE2="\[$(tput setaf 7)\]"
-    local BASE3="\[$(tput setaf 15)\]"
-    local YELLOW="\[$(tput setaf 3)\]"
-    local ORANGE="\[$(tput setaf 9)\]"
-    local RED="\[$(tput setaf 1)\]"
-    local MAGENTA="\[$(tput setaf 5)\]"
-    local VIOLET="\[$(tput setaf 13)\]"
-    local BLUE="\[$(tput setaf 4)\]"
-    local CYAN="\[$(tput setaf 6)\]"
-    local GREEN="\[$(tput setaf 2)\]"
-    local RESET="\[$(tput sgr0)\]"
-
-    PS1="$BASE0\$(LS=\$?; right_prompt; exit \$LS)"
-    PS1+="$RED\$(status_symbol \$?)$RESET\n"
-    PS1+="$BASE1\$(ppwd)$GREEN\$(git_prompt)"
-    PS1+="$ORANGE\$(root_check)"
-    PS1+="$BASE01\\$ $RESET"
-
-    export PS1
-}
-
-#export PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
-export PROMPT_COMMAND=__prompt
+PROMPT_COMMAND=__prompt
 
 # SSH agent (see .functions)
 ensure-ssh-agent
