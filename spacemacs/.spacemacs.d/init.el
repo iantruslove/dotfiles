@@ -294,7 +294,9 @@ It should only modify the values of Spacemacs settings."
    ;; Default font or prioritized list of fonts. The `:size' can be specified as
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent. (default 10.0)
-   dotspacemacs-default-font '("Roboto Mono Light for Powerline" :size 12.0 :weight normal :width normal)
+   dotspacemacs-default-font '(("Roboto Mono Light for Powerline" :size 12.0 :weight normal :width normal)
+                               ("SauceCodePro Nerd Font Mono" :size 12.0 :weight normal :width normal)
+                               ("DejaVu Sans Mono" :size 12.0 :weight normal :width normal))
 
    ;; Default icons font, it can be `all-the-icons' or `nerd-icons'.
    dotspacemacs-default-icons-font 'all-the-icons
@@ -625,8 +627,21 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.n
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (add-to-list 'exec-path "/Users/iantruslove/.nvm/versions/node/v18.17.0/bin" t)
-  )
+  ;; GUI Emacs doesn't inherit the shell's nvm setup; use the newest nvm Node.
+  (let ((bin (ian/newest-nvm-node-bin)))
+    (when bin
+      (add-to-list 'exec-path bin t)
+      (setenv "PATH" (concat (getenv "PATH") path-separator bin)))))
+
+
+(defun ian/newest-nvm-node-bin ()
+  "Return the bin directory of the newest Node installed by nvm, or nil."
+  (let* ((dirs (file-expand-wildcards (expand-file-name "~/.nvm/versions/node/v*")))
+         (newest (car (sort dirs (lambda (a b)
+                                   (version< (substring (file-name-nondirectory b) 1)
+                                             (substring (file-name-nondirectory a) 1)))))))
+    (when newest
+      (expand-file-name "bin" newest))))
 
 
 (defun dotspacemacs/user-load ()
@@ -662,7 +677,41 @@ dump."
       (require 'smartparens-config))))
 
 
+(defvar ian/org-agenda-base-files
+  '("rocks_2024.org" "projects.org" "1:1s.org" "function_it.org" "refile.org" "planning.org")
+  "Agenda files, relative to `org-directory'.")
+
+(defvar ian/org-agenda-journal-months 12
+  "How many months of journal files (including this one) to include in the agenda.")
+
+(defun ian/journal-file (&optional time)
+  "The journal file for the month of TIME (default now)."
+  (expand-file-name (format-time-string "journal/journal-%Y-%m.org" time) org-directory))
+
+(defun ian/recent-journal-files (months)
+  "Existing journal files for the last MONTHS months, newest first."
+  (let* ((now (decode-time))
+         (month (nth 4 now))
+         (year (nth 5 now))
+         files)
+    (dotimes (i months)
+      (let ((file (ian/journal-file (encode-time 0 0 0 1 (- month i) year))))
+        (when (file-exists-p file)
+          (push file files))))
+    (nreverse files)))
+
+(defun ian/set-org-agenda-files (&rest _)
+  "Set `org-agenda-files' from `ian/org-agenda-base-files' and recent journals."
+  (setq org-agenda-files
+        (append (mapcar (lambda (f) (expand-file-name f org-directory))
+                        ian/org-agenda-base-files)
+                (ian/recent-journal-files ian/org-agenda-journal-months))))
+
 (defun ian/config-org-agenda ()
+  (ian/set-org-agenda-files)
+  ;; Recompute before each agenda so new months' journals show up
+  (advice-add 'org-agenda :before #'ian/set-org-agenda-files)
+
   (setq org-agenda-dim-blocked-tasks nil
         org-agenda-compact-blocks t)
 
@@ -987,71 +1036,77 @@ dump."
            (string-match "journal" buffer-file-name))
       (error "Journal file doesn't match expected naming pattern: journal-YYYY-MM.org")))))
 
+(defun ian/capture-template (name)
+  "Path of capture template NAME in ~/.spacemacs.d/templates/."
+  (expand-file-name (concat "templates/" name) dotspacemacs-directory))
+
 (defun ian/config-org-capture ()
   ;; See documentation at https://orgmode.org/manual/Capture-templates.html
+  ;; Targets: ian/journal-file is called at capture time; "refile.org" is
+  ;; relative to org-directory.
   (setq org-capture-templates
-        (quote (("t" "todo in Journal" entry (file+datetree journal)
+        `(("t" "todo in Journal" entry (file+datetree ian/journal-file)
                  "* TODO %?\n%U\n"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("c" "todo to refile" entry (file refile)
+                ("c" "todo to refile" entry (file "refile.org")
                  "* TODO %?\n%U\n%a\n"
                  :clock-in t :clock-resume t)
 
-                ("D" "A task that needs delegating later" entry (file+datetree journal)
+                ("D" "A task that needs delegating later" entry (file+datetree ian/journal-file)
                  "* TODO %^{What}   \t:@%^{Who}:\n%U\n%l\n"
                  :clock-in t :clock-resume t :immediate-finish t :empty-lines 1)
 
-                ("d" "Record a delegated task" entry (file+datetree journal)
+                ("d" "Record a delegated task" entry (file+datetree ian/journal-file)
                  "* DELEGATED @%\\2 %^{What}\n:PROPERTIES:\n:OWNER: %^{Owner}\n:WHY: %^{Why}\n:DOD: %^{DoD}\n:END:\nDEADLINE: %^{Deadline}t\n%U\n%l\n"
                  :clock-in t :clock-resume t :immediate-finish t :empty-lines 1)
 
-                ("n" "note" entry (file+datetree journal)
+                ("n" "note" entry (file+datetree ian/journal-file)
                  "* %? :NOTE:\n%U\n"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("j" "Journal" entry (file+datetree journal)
+                ("j" "Journal" entry (file+datetree ian/journal-file)
                  "* %?\n%U\n"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("m" "Meeting" entry (file+datetree journal)
+                ("m" "Meeting" entry (file+datetree ian/journal-file)
                  "* MEETING %? :meeting:\n%U"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("1" "1:1 Meeting" entry (file+datetree journal)
+                ("1" "1:1 Meeting" entry (file+datetree ian/journal-file)
                  "* MEETING %^{Who} 1:1  \t:meeting:one_on_one:@%\\1:\n%U\n\n%?"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("e" "Email" entry (file+datetree journal)
+                ("e" "Email" entry (file+datetree ian/journal-file)
                  "* EMAIL %? :email:\n%U"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("r" "Code Review" entry (file+datetree journal)
+                ("r" "Code Review" entry (file+datetree ian/journal-file)
                  "* Code Review: %?  :code_review:\n%U\n"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("P" "Daily Planning" entry (file+datetree journal)
-                 (file "~/.emacs.d.Ian/modes/org-capture-daily-planning.org")
+                ("P" "Daily Planning" entry (file+datetree ian/journal-file)
+                 (file ,(ian/capture-template "org-capture-daily-planning.org"))
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("W" "Weely Planning" entry (file+datetree journal)
-                 (file "~/.emacs.d.Ian/modes/org-capture-weekly-planning.org")
+                ("W" "Weely Planning" entry (file+datetree ian/journal-file)
+                 (file ,(ian/capture-template "org-capture-weekly-planning.org"))
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("R" "Daily Review" entry (file+datetree journal)
+                ("R" "Daily Review" entry (file+datetree ian/journal-file)
                  "* Review\n%U\n** What did I achieve today? :wdiat:\n*** %?\n** What did I learn today? :wdilt:\n*** \n** What do I need to do tomorrow?\n*** TODO \n"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("s" "shoutout" entry (file+datetree journal)
+                ("s" "shoutout" entry (file+datetree ian/journal-file)
                  "* @%? :shoutout:\n%U\n"
                  :clock-in t :clock-resume t :empty-lines 1)
 
-                ("w" "org-protocol" entry (file refile)
+                ("w" "org-protocol" entry (file "refile.org")
                  "* TODO Review %c\n%U\n"
                  :immediate-finish t)
 
-                ("h" "Habit" entry (file refile)
-                 "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n"))))
+                ("h" "Habit" entry (file "refile.org")
+                 "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")))
   )
 
 
@@ -1141,12 +1196,9 @@ dump."
 (defun ian/config-org ()
   (require 'org)
   (with-eval-after-load 'org
-    (add-to-list 'load-path (expand-file-name "~/.emacs.d.Ian/modes/"))
+    (add-to-list 'load-path (expand-file-name "lisp/" dotspacemacs-directory))
     (require 'org-lib)
     (require 'org-clocktable-by-tag)
-
-    (defvar journal (concat org-directory "/journal/journal-" (format-time-string "%Y-%m") ".org"))
-    (defvar refile (concat org-directory "/refile.org"))
 
     (ian/config-org-basics)
     (ian/config-org-agenda)
@@ -1177,10 +1229,9 @@ dump."
 
 
 (defun ian/config-os ()
-  (if (eq system-type 'darwin)
-      (progn
-        ;; gls is the coreutils ls, installed with `brew install coreutils`
-        (setq insert-directory-program "gls")))
+  ;; dired needs GNU ls; on macOS that's gls from `brew install coreutils`
+  (when (and (eq system-type 'darwin) (executable-find "gls"))
+    (setq insert-directory-program "gls"))
 
   (if window-system
       (scroll-bar-mode -1))
@@ -1276,7 +1327,12 @@ before packages are loaded."
   ;; Key bindings
   (spacemacs/set-leader-keys "fP" 'ian/find-file-at-point-immediate)
 
-  (require 'gptel))
+  (require 'gptel)
+
+  ;; Machine-local settings, not in git: ~/.spacemacs.d/local.el
+  (let ((local (expand-file-name "local.el" dotspacemacs-directory)))
+    (when (file-exists-p local)
+      (load local nil t))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1295,23 +1351,6 @@ This function is called at the very end of Spacemacs initialization."
    '(grep-find-ignored-directories
      '("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs"
        "{arch}" "node_modules"))
-   '(org-agenda-files
-     '("/Users/iantruslove/org/rocks_2024.org" "/Users/iantruslove/org/projects.org"
-       "/Users/iantruslove/org/1:1s.org" "/Users/iantruslove/org/function_it.org"
-       "/Users/iantruslove/org/refile.org" "/Users/iantruslove/org/planning.org"
-       "/Users/iantruslove/org/journal/journal-2025-01.org"
-       "/Users/iantruslove/org/journal/journal-2025-02.org"
-       "/Users/iantruslove/org/journal/journal-2025-03.org"
-       "/Users/iantruslove/org/journal/journal-2025-04.org"
-       "/Users/iantruslove/org/journal/journal-2025-05.org"
-       "/Users/iantruslove/org/journal/journal-2025-06.org"
-       "/Users/iantruslove/org/journal/journal-2025-07.org"
-       "/Users/iantruslove/org/journal/journal-2025-08.org"
-       "/Users/iantruslove/org/journal/journal-2025-09.org"
-       "/Users/iantruslove/org/journal/journal-2025-10.org"
-       "/Users/iantruslove/org/journal/journal-2025-11.org"
-       "/Users/iantruslove/org/journal/journal-2025-12.org"))
-
    '(warning-suppress-types '((lsp-mode))))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
