@@ -1,21 +1,5 @@
 # -*- mode: sh -*-
 
-# Set Title
-function set-title {
-  case $TERM in
-    tmux|screen)
-      if [ -n "$TMUX" ]; then
-        tmux rename-window -t${TMUX_PANE} $*
-      else
-        printf "\ek$*\e\\"
-      fi
-      ;;
-    alacritty*|xterm*|cygwin*)
-      printf "\033]0;$*\007"
-      ;;
-  esac
-}
-
 ################################################################################
 # fix-agent - from Joe's https://gist.github.com/joegallo/84df64e178a5ba25899b
 # Re-point a stale shell (tmux, long-lived ssh session) at the newest live agent

@@ -18,9 +18,11 @@ else
 fi
 
 # Docker
+alias d='docker'
+alias dc='docker compose'
 alias dr='docker run -it --rm'
 alias drs='docker_run_shell'  # see .functions
-alias drm='docker rm $(docker ps -a -f status=exited -q)'
+alias drm='docker container prune -f'  # remove stopped containers
 
 # Kubernetes
 alias k='kubectl'
@@ -33,9 +35,6 @@ alias gco='git checkout'
 alias gst='git status'
 alias gpr='git pull --rebase'  # Note possible collision with `gpr` command...
 alias gf='git fetch -a'
-
-# Rush
-alias rbt='rush build --to .'
 
 # Tmux
 alias tls='tmux list-sessions'
@@ -59,13 +58,6 @@ trw() {
 # Whats My IP
 alias wmi='dig +short myip.opendns.com @resolver1.opendns.com'
 
-# Mac
-if [ `uname` = "Darwin" ]; then
-    alias o='open'
-    alias pbc='pbcopy'
-    alias pbp='pbpaste'
-fi
-
 # File Download
 alias get='curl --continue-at - --location --progress-bar --remote-name --remote-time'
 
@@ -73,44 +65,33 @@ alias get='curl --continue-at - --location --progress-bar --remote-name --remote
 alias df='df -kh'
 alias du='du -kh'
 
-# Docker
-alias d='docker'
-alias dc='docker-compose'
-# alias ecrl='$(aws ecr get-login --no-include-email)'
-
 # Grep Colors
 alias grep='grep --color=auto'
 
-# Brew
-if [ `uname` = "Darwin" ]; then
+# macOS
+if [ "$(uname)" = "Darwin" ]; then
+    alias o='open'
+    alias pbc='pbcopy'
+    alias pbp='pbpaste'
+
+    # Brew
     alias brews='brew list -1'
     alias bubo='brew update && brew outdated'
     alias bubc='brew upgrade && brew cleanup'
     alias bubu='bubo && bubc'
     alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
+
+    # GNU date (brew install coreutils)
+    command -v gdate >/dev/null 2>&1 && alias date=gdate
 fi
 
-# Fix date on mac (requires coreutils - `brew install coreutils`)
-if [ `uname` = "Darwin" ]; then
-    if type -p gdate &>/dev/null; then
-        alias date=gdate
-    fi
-fi
-
-# Only define pbcopy / pbpaste if they don't already exist
+# pbcopy elsewhere: copy stdin to the local clipboard via OSC 52
+# (works over ssh/mosh/tmux with a supporting terminal)
 if ! command -v pbcopy >/dev/null 2>&1; then
     pbcopy() {
         local data
         data=$(base64 | tr -d '\n')
         printf '\033]52;c;%s\a' "$data"
-    }
-fi
-
-if ! command -v pbpaste >/dev/null 2>&1; then
-    pbpaste() {
-        # Request clipboard contents via OSC 52
-        # WezTerm responds by pasting it into the terminal
-        printf '\033]52;c;?\a'
     }
 fi
 
