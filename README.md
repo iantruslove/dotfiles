@@ -8,11 +8,9 @@ from [kelsin/dotfiles](https://github.com/kelsin/dotfiles).
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh
-# or, for a server:
-curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh -s server
 ```
 
-(With wget: `wget -qO- <url> | sh` / `wget -qO- <url> | sh -s server`.)
+(With wget: `wget -qO- <url> | sh`.) The same setup is used on every machine.
 
 `bootstrap` installs git and stow (brew, apt, dnf, pacman or pkg), clones this
 repo to `~/.dotfiles` over HTTPS (pushes go over SSH), runs `install`, and
@@ -42,7 +40,7 @@ zsh plugins (via zplug) install themselves on the first shell start.
 
 ```sh
 cd ~/.dotfiles
-./install            # stow the workstation set (./install server for servers)
+./install            # stow all packages
 stow -R zsh          # restow one package
 stow -D zsh          # remove one package
 ```

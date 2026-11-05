@@ -2,20 +2,9 @@
 # Bootstrap dotfiles on a new machine (macOS or Linux).
 #
 #   curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh
-#   curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh -s server
 #
 # Installs git and stow, clones (or updates) ~/.dotfiles, and stows packages.
 set -e
-
-PROFILE=${1:-workstation}
-case $PROFILE in
-  workstation|server) ;;
-  mac|linux) PROFILE=workstation ;;  # old argument names
-  *)
-    echo "Usage: $0 [workstation|server]" >&2
-    exit 1
-    ;;
-esac
 
 REPO_HTTPS=https://github.com/iantruslove/dotfiles.git
 REPO_SSH=git@github.com:iantruslove/dotfiles.git
@@ -59,7 +48,7 @@ else
 fi
 
 # 3. Stow packages
-"$DOTFILES/install" "$PROFILE"
+"$DOTFILES/install"
 
 # 4. Things the configs expect but don't install themselves
 if have tmux && [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
