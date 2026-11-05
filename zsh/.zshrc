@@ -61,7 +61,6 @@ bindkey '^[[Z' undo                                             # Shift+tab undo
 # Functions and Aliases
 [ -f ~/.functions ] && . ~/.functions
 [ -f ~/.aliases ] && . ~/.aliases
-[ -f ~/.env ] && . ~/.env
 
 ################################################################################
 # Theming section

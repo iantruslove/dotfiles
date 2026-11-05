@@ -80,4 +80,10 @@ fi
 export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 
 # Secrets (API tokens, etc.) - stored in uncommitted .env.secrets
+[ -f "$DOTFILES/main/.env.secrets" ] && source "$DOTFILES/main/.env.secrets"
 [ -f "$DOTFILES/main/.env.secrets.sh" ] && source "$DOTFILES/main/.env.secrets.sh"
+
+# Disable docker sbx telemetry
+export SBX_NO_TELEMETRY=1
+# Other telemetry-off flags:
+export HOMEBREW_NO_ANALYTICS=1
