@@ -68,13 +68,19 @@ Things specific to one machine stay out of git:
 clones it when emacs is installed). The config is `~/.spacemacs.d/init.el`; make
 sure there is no `~/.spacemacs`, which would take precedence.
 
+The org agenda is every `.org` file at the top of `org-directory` (only the
+newest `rocks_YYYY.org`), plus the last 12 months of `journal/journal-YYYY-MM.org`,
+recomputed each time the agenda opens. Adding a file to the org directory puts it
+in the agenda on every machine; there's no need for `C-c [`.
+
 Per-machine settings go in `~/.spacemacs.d/local.el`, loaded at the end of
 `dotspacemacs/user-config`. For example:
 
 ```elisp
 (setq org-directory "~/Dropbox/org"
       ian/org-agenda-journal-months 3)
-(add-to-list 'ian/org-agenda-base-files "client-x.org")
+(setq ian/org-agenda-exclude-regexp "\\`scratch")
+(add-to-list 'ian/org-agenda-extra-files "~/work/client-x.org")
 ```
 
 GUI Emacs gets its environment from `~/.spacemacs.d/.spacemacs.env` (also

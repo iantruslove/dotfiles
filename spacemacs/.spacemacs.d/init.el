@@ -674,9 +674,32 @@ dump."
       (require 'smartparens-config))))
 
 
-(defvar ian/org-agenda-base-files
-  '("rocks_2024.org" "projects.org" "1:1s.org" "function_it.org" "refile.org" "planning.org")
-  "Agenda files, relative to `org-directory'.")
+(defun ian/rocks-tag (&optional quarterly)
+  "This year's rocks tag (R_2026), or with QUARTERLY this quarter's (R_2026q4)."
+  (let ((now (decode-time)))
+    (if quarterly
+        (format "R_%dq%d" (nth 5 now) (1+ (/ (1- (nth 4 now)) 3)))
+      (format "R_%d" (nth 5 now)))))
+
+(defvar ian/org-agenda-exclude-regexp nil
+  "Files in `org-directory' whose names match this regexp stay out of the agenda.")
+
+(defvar ian/org-agenda-extra-files nil
+  "Agenda files outside `org-directory' (absolute, or relative to it).")
+
+(defun ian/org-agenda-directory-files ()
+  "The .org files at the top of `org-directory', minus the excluded ones.
+Of the yearly rocks_YYYY.org files, only the newest is included."
+  (let* ((files (directory-files org-directory t org-agenda-file-regexp))
+         (rocks (seq-filter (lambda (f) (string-match-p "\\`rocks_[0-9]+\\.org\\'"
+                                                        (file-name-nondirectory f)))
+                            files)))
+    (seq-remove (lambda (f)
+                  (or (and (member f rocks) (not (equal f (car (last rocks)))))
+                      (and ian/org-agenda-exclude-regexp
+                           (string-match-p ian/org-agenda-exclude-regexp
+                                           (file-name-nondirectory f)))))
+                files)))
 
 (defvar ian/org-agenda-journal-months 12
   "How many months of journal files (including this one) to include in the agenda.")
@@ -698,11 +721,14 @@ dump."
     (nreverse files)))
 
 (defun ian/set-org-agenda-files (&rest _)
-  "Set `org-agenda-files' from `ian/org-agenda-base-files' and recent journals."
+  "Set `org-agenda-files': every .org file in `org-directory', recent journals,
+and `ian/org-agenda-extra-files'. A new file in the (synced) org directory is
+picked up automatically on every machine; no `C-c [' needed."
   (setq org-agenda-files
-        (append (mapcar (lambda (f) (expand-file-name f org-directory))
-                        ian/org-agenda-base-files)
-                (ian/recent-journal-files ian/org-agenda-journal-months))))
+        (append (ian/org-agenda-directory-files)
+                (ian/recent-journal-files ian/org-agenda-journal-months)
+                (mapcar (lambda (f) (expand-file-name f org-directory))
+                        ian/org-agenda-extra-files))))
 
 (defun ian/config-org-agenda ()
   (ian/set-org-agenda-files)
@@ -748,7 +774,7 @@ dump."
               (if deadline (format-time-string "%Y-%m-%d" deadline) ""))))
 
   (setq org-agenda-custom-commands
-        (quote (("G" "Goal View"
+        `(("G" "Goal View"
 
                  ((tags-todo "TODO=\"NEXT\"+goals+current|TODO=\"TODO\"+goals+current"
                              ((org-agenda-overriding-header "Active Goals")
@@ -868,10 +894,10 @@ dump."
                 ("P" "Projects"
                  ((agenda "" nil)
 
-                  (tags-todo "-#home-LATER-CANCELLED+{^R_202.*}"
+                  (tags-todo ,(concat "-#home-LATER-CANCELLED+{^" (ian/rocks-tag) "}")
                              ((org-agenda-overriding-header "Rocks")
                               (org-use-tag-inheritance nil)
-                              (org-agenda-hide-tags-regexp "R_20..q.")
+                              (org-agenda-hide-tags-regexp "R_[0-9]+q[1-4]")
                               (org-tags-match-list-sublevels t)
                               (org-agenda-sorting-strategy
                                '(category-keep))))
@@ -917,15 +943,15 @@ dump."
                               (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
                               (org-agenda-sorting-strategy
                                '(category-keep)))))
-                 nil)))))
+                 nil))))
 
 
 (defun ian/config-org-tags ()
   ;; Tags with fast selection keys
-  (setq org-tag-alist (quote (
-                              ;; Rocks
-                              ("R_2024q3" . ?r)
-                              ("R_2024" . ?R)
+  (setq org-tag-alist `(
+                              ;; Rocks for this quarter and year, e.g. R_2026q4, R_2026
+                              (,(ian/rocks-tag t) . ?r)
+                              (,(ian/rocks-tag) . ?R)
 
                               ;; Traffic Lights
                               (:startgroup)
@@ -969,7 +995,7 @@ dump."
                               ("DECISION" . ?D)
                               ("TECH_DEBT" . ?T)
                               ("CANCELLED" . ?c)
-                              ("FLAGGED" . ??))))
+                              ("FLAGGED" . ??)))
 
   ;; Allow setting single tags without the menu
   (setq org-fast-tag-selection-single-key (quote expert))
