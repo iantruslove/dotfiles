@@ -3,7 +3,7 @@
 
 # Core tools the dotfiles rely on
 brew 'coreutils'   # gdate etc. (see .aliases)
-brew 'fzf'         # zsh fzf plugin, tmux session picker
+brew 'fzf'         # zsh key bindings, tmux session picker
 brew 'git'
 brew 'git-lfs'
 brew 'mosh'        # nuc alias

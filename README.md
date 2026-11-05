@@ -26,14 +26,17 @@ Then finish up by hand:
 - In tmux, `<prefix> I` to install plugins
 - Optional: `fzf`, `zoxide`, `mosh` (on macOS, `brew bundle` installs them)
 
-zsh plugins (via zplug) install themselves on the first shell start.
+zsh plugins are listed in `zsh/.zsh_plugins.txt` and managed by
+[antidote](https://antidote.sh), which installs itself and the plugins on the
+first shell start; `antidote update` updates them. If a machine still has
+`~/.zplug` from the old setup, delete it.
 
 ## Packages
 
 | Package | Contents |
 |---------|----------|
 | `main`  | Shared environment (`.env.sh`), `.aliases`, `.functions`, git, ssh, WezTerm, `~/bin` scripts |
-| `zsh`   | zsh startup files, prompt, zplug plugins |
+| `zsh`   | zsh startup files, prompt, plugin list |
 | `bash`  | bash fallback config (for machines/containers without zsh) |
 | `tmux`  | tmux config (prefix is `C-z`) plus Linux-specific bits |
 | `emacs` | Old config, not currently stowed |

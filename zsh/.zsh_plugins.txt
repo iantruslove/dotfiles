@@ -1,0 +1,8 @@
+# zsh plugins, loaded in order by antidote (https://antidote.sh) from .zshrc.
+# Edits take effect on the next shell start; `antidote update` updates them.
+
+zsh-users/zsh-completions path:src kind:fpath
+zsh-users/zsh-autosuggestions
+
+# Keep last: it wraps the zle widgets defined before it
+zsh-users/zsh-syntax-highlighting
