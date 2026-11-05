@@ -26,13 +26,45 @@ fi
 # Browser
 [[ "$OSTYPE" == darwin* ]] && export BROWSER='open'
 
-# Path setup: include home bin dir and brew directories
-PATH="$PATH:$HOME/bin"
-for d in /opt/homebrew/sbin /usr/local/sbin /opt/homebrew/bin /opt/openssl/bin /usr/local/bin ; do
-    if [[ -d $d ]] ; then
-        PATH="$d:$PATH"
+# Homebrew (Apple Silicon, Intel, or Linuxbrew)
+for p in /opt/homebrew /usr/local /home/linuxbrew/.linuxbrew; do
+    if [ -x "$p/bin/brew" ]; then
+        export HOMEBREW_PREFIX=$p
+        break
     fi
 done
+unset p
+
+# PATH: all additions live here so bash and zsh agree. path_prepend skips
+# missing directories and ones already on PATH, so re-sourcing is harmless.
+# Later entries end up earlier in PATH.
+path_prepend() {
+    [ -d "$1" ] || return 0
+    case ":$PATH:" in
+        *":$1:"*) ;;
+        *) PATH="$1:$PATH" ;;
+    esac
+}
+if [[ "$OSTYPE" == darwin* ]]; then
+    PNPM_HOME="$HOME/Library/pnpm"
+else
+    PNPM_HOME="$HOME/.local/share/pnpm"
+fi
+[ -d "$PNPM_HOME" ] && export PNPM_HOME || unset PNPM_HOME
+
+path_prepend /usr/local/sbin
+path_prepend /usr/local/bin
+if [ -n "$HOMEBREW_PREFIX" ]; then
+    path_prepend "$HOMEBREW_PREFIX/sbin"
+    path_prepend "$HOMEBREW_PREFIX/bin"
+    path_prepend "$HOMEBREW_PREFIX/opt/libpq/bin"   # psql, pg_dump
+fi
+path_prepend "$HOME/.yarn/bin"
+path_prepend "$HOME/.cargo/bin"
+[ -n "$PNPM_HOME" ] && path_prepend "$PNPM_HOME"
+path_prepend "$HOME/.opencode/bin"
+path_prepend "$HOME/.local/bin"                     # uv, pipx, etc.
+path_prepend "$HOME/bin"
 export PATH
 
 # Less: pass ANSI colors through
@@ -61,9 +93,6 @@ export VISUAL='emacsclient -t'
 #export VISUAL='emacsclient -c -n'
 
 export PAGER='less'
-
-# Rust
-[ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
 # Secrets (API tokens, etc.) - stored in uncommitted .env.secrets
 [ -f "$DOTFILES/main/.env.secrets" ] && source "$DOTFILES/main/.env.secrets"

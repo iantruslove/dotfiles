@@ -240,11 +240,8 @@ ensure-ssh-agent
 ################################################################################
 # Completions
 
-# Set up homebrew completions
-if type brew &>/dev/null
-then
-    FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-fi
+# Homebrew completions (HOMEBREW_PREFIX is set in .env.sh)
+[[ -n "$HOMEBREW_PREFIX" ]] && fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" $fpath)
 
 # Having loaded the zsh-completions plugin and possibly others during
 # the starup sequence, reload completion backends:
@@ -260,19 +257,6 @@ autoload -Uz compinit && compinit
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
-
-# pnpm (default PNPM_HOME differs by OS)
-if [[ "$OSTYPE" == darwin* ]]; then
-    export PNPM_HOME="$HOME/Library/pnpm"
-else
-    export PNPM_HOME="$HOME/.local/share/pnpm"
-fi
-[[ -d "$PNPM_HOME" ]] && path=("$PNPM_HOME" $path)
-
-# opencode
-[[ -d "$HOME/.opencode/bin" ]] && path=("$HOME/.opencode/bin" $path)
 
 ################################################################################
 # Machine-local config: source executable files in ~/.site (not in git)
