@@ -186,8 +186,6 @@ zplug "zsh-users/zsh-completions"
 # zplug "zsh-users/zsh-history-substring-search", defer:2
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
 
-zplug "MichaelAquilina/zsh-autoswitch-virtualenv"
-
 # Install plugins if there are plugins that have not been installed
 zplug check || zplug install
 

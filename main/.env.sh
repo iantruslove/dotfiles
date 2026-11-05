@@ -65,21 +65,6 @@ export PAGER='less'
 # Rust
 [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
-# Python
-if [ -x $HOME/.pyenv/bin/pyenv ] ; then
-    export PYENV_ROOT="$HOME/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-fi
-
-if command -v pyenv 1>/dev/null 2>&1; then
-    eval "$(pyenv init --path)"
-
-    if command -v pyenv-virtualenv-init > /dev/null; then
-        eval "$(pyenv virtualenv-init -)";
-    fi
-fi
-export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-
 # Secrets (API tokens, etc.) - stored in uncommitted .env.secrets
 [ -f "$DOTFILES/main/.env.secrets" ] && source "$DOTFILES/main/.env.secrets"
 [ -f "$DOTFILES/main/.env.secrets.sh" ] && source "$DOTFILES/main/.env.secrets.sh"
