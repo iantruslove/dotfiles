@@ -137,3 +137,6 @@ nuctunnel() {
     wait "$ssh_pid"
     trap - INT
 }
+
+# bws
+bwsx() { BWS_ACCESS_TOKEN="$(secret-tool lookup service bws account agentic-runner)" bws "$@"; }
