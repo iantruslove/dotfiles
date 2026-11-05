@@ -39,7 +39,6 @@ first shell start; `antidote update` updates them. If a machine still has
 | `zsh`   | zsh startup files, prompt, plugin list |
 | `bash`  | bash fallback config (for machines/containers without zsh) |
 | `tmux`  | tmux config (prefix is `C-z`) plus Linux-specific bits |
-| `emacs` | Old config, not currently stowed |
 
 ```sh
 cd ~/.dotfiles

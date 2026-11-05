@@ -5,27 +5,6 @@ main/.env.secrets*
 
 main/.site/*
 
-# Emacs Ignores
-emacs/.emacs.d/.cache
-emacs/.emacs.d/.lsp-session-v1
-emacs/.emacs.d/.mc-lists.el
-emacs/.emacs.d/bookmarks
-emacs/.emacs.d/custom.el
-emacs/.emacs.d/elpa
-emacs/.emacs.d/eshell
-emacs/.emacs.d/ido.last
-emacs/.emacs.d/network-security.data
-emacs/.emacs.d/persp-confs
-emacs/.emacs.d/places
-emacs/.emacs.d/projectile-bookmarks.eld
-emacs/.emacs.d/projectile.cache
-emacs/.emacs.d/recentf
-emacs/.emacs.d/sementicdb
-emacs/.emacs.d/smex-items
-emacs/.emacs.d/transient
-emacs/.emacs.d/url
-*.elc
-
 # AI
 .claude
 .serena
