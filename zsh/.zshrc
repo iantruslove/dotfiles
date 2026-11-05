@@ -85,13 +85,10 @@ else
     echo $USER@$HOST  $(uname -srm)
 fi
 ## Prompt on right side:
-#  - shows status of git when in git repository (code adapted from https://techanic.net/2012/12/30/my_git_prompt_for_zsh.html)
-#  - shows exit status of previous command (if previous command finished with an error)
-#  - is invisible, if neither is the case
+#  - in a git repo: branch plus state markers (one `git status` call)
+#  - otherwise: exit status of the previous command, if it failed
 
-
-# Modify the colors and symbols in these variables as desired.
-GIT_PROMPT_SYMBOL="%{$fg[blue]%}±"                              # plus/minus     - clean repo
+GIT_PROMPT_SYMBOL="%{$fg[blue]%}±"
 GIT_PROMPT_PREFIX="%{$fg[green]%}[%{$reset_color%}"
 GIT_PROMPT_SUFFIX="%{$fg[green]%}]%{$reset_color%}"
 GIT_PROMPT_AHEAD="%{$fg[red]%}ANUM%{$reset_color%}"             # A"NUM"         - ahead by "NUM" commits
@@ -99,59 +96,38 @@ GIT_PROMPT_BEHIND="%{$fg[cyan]%}BNUM%{$reset_color%}"           # B"NUM"        
 GIT_PROMPT_MERGING="%{$fg_bold[magenta]%}⚡︎%{$reset_color%}"     # lightning bolt - merge conflict
 GIT_PROMPT_UNTRACKED="%{$fg_bold[red]%}●%{$reset_color%}"       # red circle     - untracked files
 GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}●%{$reset_color%}"     # yellow circle  - tracked files modified
-GIT_PROMPT_STAGED="%{$fg_bold[green]%}●%{$reset_color%}"        # green circle   - staged changes present = ready for "git push"
-
-parse_git_branch() {
-  # Show Git branch/tag, or name-rev if on detached head
-  ( git symbolic-ref -q HEAD || git name-rev --name-only --no-undefined --always HEAD ) 2> /dev/null
-}
-
-parse_git_state() {
-  # Show different symbols as appropriate for various Git repository states
-  # Compose this value via multiple conditional appends.
-  local GIT_STATE=""
-  local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
-  if [ "$NUM_AHEAD" -gt 0 ]; then
-    GIT_STATE=$GIT_STATE${GIT_PROMPT_AHEAD//NUM/$NUM_AHEAD}
-  fi
-  local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
-  if [ "$NUM_BEHIND" -gt 0 ]; then
-    GIT_STATE=$GIT_STATE${GIT_PROMPT_BEHIND//NUM/$NUM_BEHIND}
-  fi
-  local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
-  if [ -n $GIT_DIR ] && test -r $GIT_DIR/MERGE_HEAD; then
-    GIT_STATE=$GIT_STATE$GIT_PROMPT_MERGING
-  fi
-  if [[ -n $(git ls-files --other --exclude-standard 2> /dev/null) ]]; then
-    GIT_STATE=$GIT_STATE$GIT_PROMPT_UNTRACKED
-  fi
-  if ! git diff --quiet 2> /dev/null; then
-    GIT_STATE=$GIT_STATE$GIT_PROMPT_MODIFIED
-  fi
-  if ! git diff --cached --quiet 2> /dev/null; then
-    GIT_STATE=$GIT_STATE$GIT_PROMPT_STAGED
-  fi
-  if [[ -n $GIT_STATE ]]; then
-    echo "$GIT_PROMPT_PREFIX$GIT_STATE$GIT_PROMPT_SUFFIX"
-  fi
-}
-
-# Right prompt with exit status of previous command if not successful
-#RPROMPT="%{$fg[red]%} %(?..[%?])"
-# Right prompt with exit status of previous command marked with ✓ or ✗
-#RPROMPT="%(?.%{$fg[green]%}✓ %{$reset_color%}.%{$fg[red]%}✗ %{$reset_color%})"
-
-RPROMPT='$(git_prompt_string)'
+GIT_PROMPT_STAGED="%{$fg_bold[green]%}●%{$reset_color%}"        # green circle   - staged changes
 
 git_prompt_string() {
-  local git_where="$(parse_git_branch)"
-
-  # If inside a Git repository, print its branch and state
-  [ -n "$git_where" ] && echo "$GIT_PROMPT_SYMBOL$(parse_git_state)$GIT_PROMPT_PREFIX%{$fg[yellow]%}${git_where#(refs/heads/|tags/)}$GIT_PROMPT_SUFFIX"
-
-  # If not inside the Git repo, print exit codes of last command (only if it failed)
-  [ ! -n "$git_where" ] && echo "%{$fg[red]%} %(?..[%?])"
+  local out line head state ahead=0 behind=0 conflict=0 untracked=0 modified=0 staged=0
+  if ! out=$(git status --porcelain=v2 --branch 2>/dev/null); then
+    echo "%{$fg[red]%} %(?..[%?])"
+    return
+  fi
+  for line in ${(f)out}; do
+    case $line in
+      ('# branch.head '*) head=${line#'# branch.head '} ;;
+      ('# branch.ab '*)   line=${line#'# branch.ab +'}; ahead=${line%% *}; behind=${line##* -} ;;
+      ([12]' '*)          [[ ${line[3]} != . ]] && staged=1; [[ ${line[4]} != . ]] && modified=1 ;;
+      ('u '*)             conflict=1 ;;
+      ('? '*)             untracked=1 ;;
+    esac
+  done
+  if [[ $head == '(detached)' ]]; then
+    head=$(git name-rev --name-only --no-undefined --always HEAD 2>/dev/null)
+    head=${head#tags/}
+  fi
+  (( ahead ))     && state+=${GIT_PROMPT_AHEAD//NUM/$ahead}
+  (( behind ))    && state+=${GIT_PROMPT_BEHIND//NUM/$behind}
+  (( conflict ))  && state+=$GIT_PROMPT_MERGING
+  (( untracked )) && state+=$GIT_PROMPT_UNTRACKED
+  (( modified ))  && state+=$GIT_PROMPT_MODIFIED
+  (( staged ))    && state+=$GIT_PROMPT_STAGED
+  [[ -n $state ]] && state=$GIT_PROMPT_PREFIX$state$GIT_PROMPT_SUFFIX
+  echo "$GIT_PROMPT_SYMBOL$state$GIT_PROMPT_PREFIX%{$fg[yellow]%}$head$GIT_PROMPT_SUFFIX"
 }
+
+RPROMPT='$(git_prompt_string)'
 
 
 # Color man pages
