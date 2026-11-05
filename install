@@ -1,36 +1,55 @@
 #!/usr/bin/env bash
+# Stow dotfiles packages into $HOME.
+#
+#   ./install [workstation|server]
+#
+# Regular files that would conflict with a package (e.g. a distro's default
+# ~/.bashrc) are moved to ~/.dotfiles-backup/<timestamp>/ first.
+set -u
 
-# WORKSTATION_PACKAGES="emacs main node ruby tmux vim zsh" ## TODO: Fix and uncomment all of these
-# SERVER_PACKAGES="bash main screen tmux vim" ## TODO: Fix and uncomment all of these
 WORKSTATION_PACKAGES="bash zsh main tmux"
-SERVER_PACKAGES="bash main tmux"
+SERVER_PACKAGES="bash zsh main tmux"
 
-STOW_DIR=~/.dotfiles  # `dirname $0`
+STOW_DIR=$(cd "$(dirname "$0")" && pwd)
 
-pushd $STOW_DIR > /dev/null
-
-case $1 in
-    mac|linux)
-        packages=$WORKSTATION_PACKAGES
-    ;;
-  server)
-        packages=$SERVER_PACKAGES
-        ;;
+case ${1:-workstation} in
+  workstation|mac|linux) packages=$WORKSTATION_PACKAGES ;;
+  server)                packages=$SERVER_PACKAGES ;;
   *)
-      echo "Invalid group"
-      exit 1
+    echo "Usage: $0 [workstation|server]" >&2
+    exit 1
     ;;
 esac
 
-for package in $packages; do
-    echo -n "Stowing $package...  "
-    output=$(stow -R $package 2>&1)
-    result=$?
-    if [ $result -eq 0 ]; then
-        echo "ok"
-    else
-        echo "ERROR: $output"
+cd "$STOW_DIR" || exit 1  # so stow picks up ./.stowrc
+
+backup_dir="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
+
+# Move aside any real (non-symlink) file that sits where a package file goes.
+backup_conflicts() {
+  local package=$1 rel target
+  while IFS= read -r rel; do
+    rel=${rel#./}
+    target="$HOME/$rel"
+    if [ -e "$target" ] && [ ! -L "$target" ] && [ ! -d "$target" ]; then
+      mkdir -p "$backup_dir/$(dirname "$rel")"
+      mv "$target" "$backup_dir/$rel"
+      echo "  backed up ~/$rel"
     fi
+  done < <(cd "$package" && find . -type f ! -name README.md)
+}
+
+failed=0
+for package in $packages; do
+  echo "Stowing $package..."
+  backup_conflicts "$package"
+  if ! output=$(stow -d "$STOW_DIR" -t "$HOME" -R "$package" 2>&1); then
+    echo "  ERROR: $output"
+    failed=1
+  fi
 done
 
-popd > /dev/null
+[ -d "$HOME/.ssh" ] && chmod 700 "$HOME/.ssh"
+[ -d "$backup_dir" ] && echo "Conflicting files were moved to $backup_dir"
+
+exit $failed

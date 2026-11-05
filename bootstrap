@@ -1,52 +1,78 @@
 #!/bin/sh
+# Bootstrap dotfiles on a new machine (macOS or Linux).
+#
+#   curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh
+#   curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh -s server
+#
+# Installs git and stow, clones (or updates) ~/.dotfiles, and stows packages.
+set -e
 
-case $1 in
-  mac)
-    ;;
-  linux)
-    ;;
-  server)
-    ;;
+PROFILE=${1:-workstation}
+case $PROFILE in
+  workstation|server) ;;
+  mac|linux) PROFILE=workstation ;;  # old argument names
   *)
-    echo "Invalid configuration."
-    echo "Valid options:"
-    echo "- $0 mac (sets up a Mac workstation)"
-    echo "- $0 linux (sets up a Linux workstation)"
-    echo "- $0 server (sets up a *nix server)"
+    echo "Usage: $0 [workstation|server]" >&2
     exit 1
+    ;;
 esac
 
-# First install brew on a mac
-if [ `uname` = "Darwin" ]; then
-  command -v brew >/dev/null 2>&1 || \
-    /bin/bash -c \
-    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+REPO_HTTPS=https://github.com/iantruslove/dotfiles.git
+REPO_SSH=git@github.com:iantruslove/dotfiles.git
+DOTFILES=$HOME/.dotfiles
 
-  # Install git and stow (skipping any already present, to avoid brew warnings)
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# 1. git and stow
+if [ "$(uname)" = "Darwin" ]; then
+  if ! have brew; then
+    NONINTERACTIVE=1 /bin/bash -c \
+      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+      [ -x "$b" ] && eval "$("$b" shellenv)" && break
+    done
+  fi
   for pkg in git stow; do
     brew list --formula "$pkg" >/dev/null 2>&1 || brew install "$pkg"
   done
-elif [ -f "/etc/arch-release" ]; then
-  sudo pacman -S --noconfirm git stow
-elif [ `uname` = "FreeBSD" ]; then
-  sudo pkg install git stow
+elif ! have git || ! have stow; then
+  if have apt-get; then
+    sudo apt-get update -qq && sudo apt-get install -y git stow
+  elif have dnf; then
+    sudo dnf install -y git stow
+  elif have pacman; then
+    sudo pacman -S --noconfirm --needed git stow
+  elif have pkg; then
+    sudo pkg install -y git stow
+  else
+    echo "Please install git and stow, then re-run." >&2
+    exit 1
+  fi
 fi
 
-# Now that git is available let's check out or update our dotfiles
-if [ -d ~/.dotfiles ]; then
-  PREV=`pwd`
-  cd ~/.dotfiles
-  git pull --quiet
-  cd $PREV
+# 2. Clone or update. Fetch over HTTPS (works before SSH keys exist), push over SSH.
+if [ -d "$DOTFILES/.git" ]; then
+  git -C "$DOTFILES" pull --quiet --ff-only
 else
-  git clone git@github.com:iantruslove/dotfiles.git ~/.dotfiles
+  git clone --quiet "$REPO_HTTPS" "$DOTFILES"
+  git -C "$DOTFILES" remote set-url --push origin "$REPO_SSH"
 fi
 
-# Stow install our apps
-~/.dotfiles/install $1
+# 3. Stow packages
+"$DOTFILES/install" "$PROFILE"
 
-# Run the update
-if [ "$1" = "mac" ]; then
-    # TODO: Uncomment ### ~/bin/update
-    :
+# 4. Things the configs expect but don't install themselves
+if have tmux && [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+  git clone --quiet https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+  echo "Installed tpm; press <prefix> I inside tmux to install plugins."
 fi
+
+echo
+echo "Done. Manual follow-ups (see README):"
+have zsh || echo "  - install zsh"
+case "$SHELL" in */zsh) ;; *) echo "  - chsh -s \"\$(command -v zsh)\"" ;; esac
+[ -f "$HOME/.git_identities/.gitconfig" ] || \
+  echo "  - create ~/.git_identities/.gitconfig (git refuses to commit without an identity)"
+for tool in fzf zoxide; do
+  have "$tool" || echo "  - optional: install $tool"
+done
