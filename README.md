@@ -1,95 +1,84 @@
 # Dotfiles
 
-dotfiles.
+Shell, git, tmux and terminal config for the macOS and Linux machines I use,
+managed with [GNU Stow](https://www.gnu.org/software/stow/). Originally forked
+from [kelsin/dotfiles](https://github.com/kelsin/dotfiles).
 
-Forked from https://github.com/kelsin/dotfiles
-
-## Goals
-
-* Able to bootstrap a new Mac machine or Linux server easily with no
-  dependencies other than `curl` or `wget`.
-* Not having to keep entire home directory in git (as I used to do)
-* Keeping external dependencies and custom scripts to a minimum
-
-## Usage
-
-### Bootstrapping
-
-Dependencies: a [posix sh][] and [curl][] or [wget][].
-
-[posix sh]: (http://pubs.opengroup.org/onlinepubs/009695399/utilities/sh.html)
-[curl]: https://curl.haxx.se/
-[wget]: https://www.gnu.org/software/wget/
-
-On a mac laptop:
+## New machine
 
 ```sh
-curl -o- https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh -s mac
+curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh
+# or, for a server:
+curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh -s server
 ```
 
-On a server:
-```sh
-curl -o- https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh -s server
-```
+(With wget: `wget -qO- <url> | sh` / `wget -qO- <url> | sh -s server`.)
 
-If you need to use wget the commands become:
+`bootstrap` installs git and stow (brew, apt, dnf, pacman or pkg), clones this
+repo to `~/.dotfiles` over HTTPS (pushes go over SSH), runs `install`, and
+installs [tpm](https://github.com/tmux-plugins/tpm). Any existing files that
+would be replaced, such as a distro's default `~/.bashrc`, are moved to
+`~/.dotfiles-backup/<timestamp>/`.
 
-```sh
-wget -O - https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh mac
-wget -O - https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh server
-```
+Then finish up by hand:
 
-### Installing
+- `chsh -s "$(command -v zsh)"`
+- Create `~/.git_identities/.gitconfig` (see [Git identities](#git-identities));
+  git refuses to commit until you do
+- In tmux, `<prefix> I` to install plugins
+- Optional: `fzf`, `zoxide`, `mosh` (on macOS, `brew bundle` installs them)
 
-The bootstrap will run an install initially for you, but at that point you can
-easily remove or install packages yourself. There is a script available that
-will setup the base mac or server package lists as well. Please note that if you
-aren't in a terminal with `$STOW_DIR` set to `~/.dotfiles` (which is done by my
-`~/.env` file) then you'll need to provide a `-d ~/.dotfiles` to all stow
-commands.
+zsh plugins (via zplug) install themselves on the first shell start.
 
-```sh
-# Install the bash package
-stow bash
+## Packages
 
-# Reinstall the bash package
-# this removes old symlinks as well as places new ones
-stow -R bash
-
-# Remove the bash package
-stow -D bash
-
-# List packages (only in zsh)
-# this is an alias in $DOTFILES/zsh/.zsh/aliases.zsh
-packages
-
-# Install mac packages (zsh script)
-$DOTFILES/install mac
-
-# Install server packages (zsh script)
-$DOTFILES/install server
-```
-
-### Updating
-
-Updating the dot files is as easy as running:
+| Package | Contents |
+|---------|----------|
+| `main`  | Shared environment (`.env.sh`), `.aliases`, `.functions`, git, ssh, WezTerm, `~/bin` scripts |
+| `zsh`   | zsh startup files, prompt, zplug plugins |
+| `bash`  | bash fallback config (for machines/containers without zsh) |
+| `tmux`  | tmux config (prefix is `C-z`) plus Linux-specific bits |
+| `emacs` | Old config, not currently stowed |
 
 ```sh
-pushd $DOTFILES && git pull && popd
+cd ~/.dotfiles
+./install            # stow the workstation set (./install server for servers)
+stow -R zsh          # restow one package
+stow -D zsh          # remove one package
 ```
 
-Updating all apple / brew / ruby and node packages on your machine can be done
-by running:
+`.stowrc` sets `--no-folding`, so directories such as `~/.ssh` and `~/bin` are
+real directories containing symlinks, never symlinks into this repo.
+
+## Machine-local config
+
+Things specific to one machine stay out of git:
+
+- **`~/.site/`**: every *executable* file in here is sourced by both bash and zsh
+  at the end of startup. Use it for per-machine aliases, PATH additions, and so on.
+- **`~/.ssh/*.config`**: included by `~/.ssh/config`.
+- **`~/.git_identities/.gitconfig`**: git identities (below).
+- **`main/.env.secrets`, `main/.env.secrets.sh`**: sourced by `.env.sh` if present.
+  Both are gitignored.
+
+### Git identities
+
+`.gitconfig` sets `user.useConfigOnly`, so each repo has to choose an identity.
+Define the identities in `~/.git_identities/.gitconfig`:
+
+```ini
+[user "github"]
+    name = Ian Truslove
+    email = you@example.com
+    signingkey = <keyID>
+    gpgsign = true
+```
+
+and choose one per repo with `git identity github`.
+
+## Updating
 
 ```sh
-update
+git -C ~/.dotfiles pull && ~/.dotfiles/install
+update   # OS + package updates: softwareupdate/brew bundle on macOS, apt/dnf/pacman on Linux
 ```
-
-Apple and brew updates are done all the time, ruby and node are only done if
-those dotfile packages are currently stowed.
-
-## Alternatives
-
-These are other solutions for storing your dotfiles:
-
-* [rcm](https://github.com/thoughtbot/rcm) rc file management utilities
