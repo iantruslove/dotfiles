@@ -5,6 +5,7 @@ main/.env.secrets*
 
 main/.site/*
 main/.git_identities/
+zsh/.zsh/cache/
 
 # AI
 .claude
