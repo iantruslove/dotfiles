@@ -7,9 +7,15 @@ export DOTFILES=$STOW_DIR
 # Setup Emacs Shell
 export ESHELL=/bin/bash
 
-# Language
-[[ -z "$LANG" ]] && export LANG='en_US.UTF-8'
-[[ -z "$LC_ALL" ]] && export LC_ALL='en_US.UTF-8'
+# Language: default LANG only if unset, preferring en_US when the locale
+# exists (minimal Linux boxes often only have C.UTF-8). Never force LC_ALL.
+if [ -z "$LANG" ]; then
+    if locale -a 2>/dev/null | grep -qiE '^en_US\.utf-?8$'; then
+        export LANG='en_US.UTF-8'
+    else
+        export LANG='C.UTF-8'
+    fi
+fi
 
 # Emacs Info Files
 [ -d "$HOME/.info" ] && export INFOPATH="$HOME/.info"
@@ -29,8 +35,8 @@ for d in /opt/homebrew/sbin /usr/local/sbin /opt/homebrew/bin /opt/openssl/bin /
 done
 export PATH
 
-# Less
-export LESS="-R -J -f -i -M -Q -S"
+# Less: pass ANSI colors through
+export LESS="-R"
 
 # Directory Colors
 export CLICOLOR=true
@@ -44,8 +50,8 @@ else
 fi
 
 # Grep Colors
-export GREP_COLOR='37;45'           # BSD.
-export GREP_COLORS="mt=$GREP_COLOR" # GNU.
+export GREP_COLORS='mt=37;45'                         # GNU
+[[ "$OSTYPE" == darwin* ]] && export GREP_COLOR='37;45' # BSD (GNU grep warns if set)
 
 # Editors
 # export EDITOR='emacs'
@@ -58,11 +64,6 @@ export PAGER='less'
 
 # Rust
 [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
-
-# Node
-if command -v npm >/dev/null 2>&1; then
-    export NODE_PATH=$NODE_PATH:$(npm root -g)
-fi
 
 # Python
 if [ -x $HOME/.pyenv/bin/pyenv ] ; then

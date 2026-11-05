@@ -1,5 +1,8 @@
 # -*- mode: sh -*-
 
+# Python
+command -v python3 >/dev/null 2>&1 && alias python='python3'
+
 # Emacsclient
 alias e='emacsclient -t -a ""'
 

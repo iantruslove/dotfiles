@@ -44,6 +44,22 @@ function fix-agent
     ssh-add -l > /dev/null
 }
 
+# Make sure SSH_AUTH_SOCK points at a usable agent. On macOS (launchd) and
+# systemd desktops (gnome-keyring's gcr-ssh-agent) the session already exports
+# one, so only fall back if nothing usable is set. Prefer reusing an existing
+# agent over spawning a new one per shell.
+function ensure-ssh-agent
+{
+    [[ -n "$SSH_AUTH_SOCK" && -S "$SSH_AUTH_SOCK" ]] && return 0
+    if [[ -S "${XDG_RUNTIME_DIR}/gcr/ssh" ]]; then
+        export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gcr/ssh"
+    elif command -v keychain > /dev/null 2>&1; then
+        eval "$(keychain --eval --agents ssh 2>/dev/null)"
+    elif ! fix-agent 2>/dev/null; then
+        eval "$(ssh-agent)" > /dev/null
+    fi
+}
+
 ################################################################################
 
 aws_email=__________________  # (your email address)

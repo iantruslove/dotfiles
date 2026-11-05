@@ -29,18 +29,14 @@ shopt -s cmdhist
 # Check window size after commands
 shopt -s checkwinsize
 
-# Let Ctrl-O work ing terminals
-if [ -f /Applications ]; then
+# Let Ctrl-O work in macOS terminals
+if [[ "$OSTYPE" == darwin* ]]; then
   stty discard undef
 fi
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
   . /etc/bashrc
-fi
-
-if [ -f /etc/bash.bashrc ]; then
-  . /etc/bash.bashrc
 fi
 
 # auto correct spelling
@@ -132,19 +128,8 @@ function __prompt {
 #export PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 export PROMPT_COMMAND=__prompt
 
-# SSH agent: on a systemd desktop the session already exports SSH_AUTH_SOCK
-# (gnome-keyring's gcr-ssh-agent, which auto-loads ~/.ssh keys at login).
-# Only fall back if nothing usable is set; never spawn a second agent blindly.
-if [[ -z "$SSH_AUTH_SOCK" || ! -S "$SSH_AUTH_SOCK" ]]; then
-    if [[ -S "${XDG_RUNTIME_DIR}/gcr/ssh" ]]; then
-        export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gcr/ssh"
-    elif command -v keychain > /dev/null; then
-        # Keychain is wicked smaht, but not necessarily installed
-        eval "$(keychain --eval --agents ssh 2>/dev/null)"
-    elif ! fix-agent 2>/dev/null; then
-        eval "$(ssh-agent)" > /dev/null
-    fi
-fi
+# SSH agent (see .functions)
+ensure-ssh-agent
 
 for f in ~/.site/*; do
     if [[ -x "$f" ]] ; then

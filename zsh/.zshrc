@@ -162,7 +162,6 @@ export LESS_TERMCAP_se=$'\E[0m'
 export LESS_TERMCAP_so=$'\E[01;47;34m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;36m'
-export LESS=-r
 
 FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
@@ -187,7 +186,6 @@ zplug "zsh-users/zsh-completions"
 # zplug "zsh-users/zsh-history-substring-search", defer:2
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
 
-alias python="python3"
 zplug "MichaelAquilina/zsh-autoswitch-virtualenv"
 
 # Install plugins if there are plugins that have not been installed
@@ -214,18 +212,8 @@ setopt HIST_REDUCE_BLANKS
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
-# SSH agent: on a systemd desktop the session already exports SSH_AUTH_SOCK
-# (gnome-keyring's gcr-ssh-agent, which auto-loads ~/.ssh keys at login).
-# Only fall back if nothing usable is set.
-if [[ -z "$SSH_AUTH_SOCK" || ! -S "$SSH_AUTH_SOCK" ]]; then
-    if [[ -S "${XDG_RUNTIME_DIR}/gcr/ssh" ]]; then
-        export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gcr/ssh"
-    elif (( $+commands[keychain] )); then
-        eval "$(keychain --eval --agents ssh 2>/dev/null)"
-    else
-        eval "$(ssh-agent)" > /dev/null
-    fi
-fi
+# SSH agent (see .functions)
+ensure-ssh-agent
 
 # # Load local plugins
 # for script in ~/.zsh/**/*.zsh; do
@@ -272,27 +260,8 @@ autoload -Uz compinit && compinit
 # NVM
 
 export NVM_DIR="$HOME/.nvm"
-if [[ -d "$NVM_DIR" ]]; then
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-    # the following is taken from
-    # https://github.com/nvm-sh/nvm/issues/1277#issuecomment-693390529 to decrease
-    # nvm's effect on shell startup time
-
-    NODE_GLOBALS=(`find "$NVM_DIR/versions/node" -maxdepth 3 -type l -wholename '*/bin/*' 2>/dev/null | xargs -n1 basename | sort | uniq`)
-    NODE_GLOBALS+=(node nvm yarn)
-
-    _load_nvm() {
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-    }
-
-    for cmd in "${NODE_GLOBALS[@]}"; do
-        eval "function ${cmd}(){ unset -f ${NODE_GLOBALS[*]}; _load_nvm; unset -f _load_nvm; ${cmd} \$@; }"
-    done
-    unset cmd NODE_GLOBALS
-fi
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 
