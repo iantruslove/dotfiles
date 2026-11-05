@@ -1,6 +1,0 @@
-#!/usr/bin/env zsh
-
-# Load
-. ~/.zsh/nvm.zsh
-
-nvm install --lts
