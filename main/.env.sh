@@ -64,6 +64,7 @@ path_prepend "$HOME/.cargo/bin"
 [ -n "$PNPM_HOME" ] && path_prepend "$PNPM_HOME"
 path_prepend "$HOME/.opencode/bin"
 path_prepend "$HOME/.local/bin"                     # uv, pipx, etc.
+path_prepend "$HOME/.docker/bin"                     # uv, pipx, etc.
 path_prepend "$HOME/bin"
 export PATH
 
