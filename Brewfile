@@ -6,6 +6,7 @@ brew 'coreutils'   # gdate etc. (see .aliases)
 brew 'fzf'         # zsh key bindings, tmux session picker
 brew 'git'
 brew 'git-lfs'
+brew 'herdr'       # terminal workspace manager (herdr package)
 brew 'mosh'        # nuc alias
 brew 'stow'
 brew 'tmux'
@@ -44,6 +45,7 @@ cask 'dropbox'
 cask 'emacs'
 cask 'evernote'
 cask 'firefox'
+cask 'ghostty'     # terminal (config in main/.config/ghostty)
 cask 'google-chrome'
 cask 'launchbar'
 cask 'slack'

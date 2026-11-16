@@ -24,7 +24,9 @@ Then finish up by hand:
 - Create `~/.git_identities/.gitconfig` (see [Git identities](#git-identities));
   git refuses to commit until you do
 - In tmux, `<prefix> I` to install plugins
-- Optional: `fzf`, `zoxide`, `mosh` (on macOS, `brew bundle` installs them)
+- Optional: `fzf`, `zoxide`, `mosh`, [herdr](https://herdr.dev) and
+  [Ghostty](https://ghostty.org). On macOS, `brew bundle` installs them (and
+  the GUI apps in the Brewfile); `update` runs it on every later update
 
 zsh plugins are listed in `zsh/.zsh_plugins.txt` and managed by
 [antidote](https://antidote.sh), which installs itself and the plugins on the
@@ -35,7 +37,7 @@ first shell start; `antidote update` updates them. If a machine still has
 
 | Package | Contents |
 |---------|----------|
-| `main`  | Shared environment (`.env.sh`), `.aliases`, `.functions`, git, ssh, WezTerm, `~/bin` scripts |
+| `main`  | Shared environment (`.env.sh`), `.aliases`, `.functions`, git, ssh, WezTerm, Ghostty, `~/bin` scripts |
 | `zsh`   | zsh startup files, prompt, plugin list |
 | `bash`  | bash fallback config (for machines/containers without zsh) |
 | `tmux`  | tmux config (prefix is `C-z`) plus Linux-specific bits |

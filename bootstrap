@@ -67,6 +67,6 @@ have zsh || echo "  - install zsh"
 case "$SHELL" in */zsh) ;; *) echo "  - chsh -s \"\$(command -v zsh)\"" ;; esac
 [ -f "$HOME/.git_identities/.gitconfig" ] || \
   echo "  - create ~/.git_identities/.gitconfig (git refuses to commit without an identity)"
-for tool in fzf zoxide; do
+for tool in fzf zoxide herdr; do
   have "$tool" || echo "  - optional: install $tool"
 done
