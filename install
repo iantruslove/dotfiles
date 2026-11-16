@@ -7,7 +7,7 @@
 # ~/.bashrc) are moved to ~/.dotfiles-backup/<timestamp>/ first.
 set -u
 
-PACKAGES="bash zsh main tmux spacemacs"
+PACKAGES="bash zsh main tmux herdr spacemacs"
 
 STOW_DIR=$(cd "$(dirname "$0")" && pwd)
 

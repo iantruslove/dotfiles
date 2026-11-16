@@ -1,0 +1,72 @@
+# herdr config, a best-effort port of ../../../tmux/.tmux.conf
+# Full reference: herdr --default-config
+# Apply changes:  herdr server reload-config  (or <prefix> R)
+#
+# Concept mapping: tmux session -> herdr workspace, window -> tab, pane -> pane.
+
+onboarding = false
+
+[theme]
+name = "catppuccin"
+
+[theme.custom]
+# tmux colour39, used for the current window in the status bar
+accent = "#00afff"
+
+[keys]
+# tmux: set -g prefix C-z
+# Note: herdr has no send-prefix, so C-z no longer reaches the shell to suspend jobs.
+prefix = "ctrl+z"
+
+# tmux defaults already match: c new tab, n/p next/prev tab, 1..9 switch tab,
+# x close pane, z zoom, [ copy mode, R reload config, h/j/k/l focus pane.
+
+# tmux: bind Z last-window (herdr only has last pane, across tabs/workspaces)
+last_pane = "prefix+shift+z"
+
+# tmux: bind -r C-h/j/k/l resize-pane (not repeatable; use <prefix> r resize mode for that)
+resize_pane_left = "prefix+ctrl+h"
+resize_pane_down = "prefix+ctrl+j"
+resize_pane_up = "prefix+ctrl+k"
+resize_pane_right = "prefix+ctrl+l"
+
+# tmux: bind -r C-n/C-p switch-client -n/-p (sessions -> workspaces)
+next_workspace = "prefix+ctrl+n"
+previous_workspace = "prefix+ctrl+p"
+
+# tmux: bind C-s fzf session picker
+workspace_picker = ["prefix+w", "prefix+ctrl+s"]
+
+# tmux: bind C-c claude-tmux popup (herdr's agent navigator does the same job)
+goto = ["prefix+g", "prefix+ctrl+c"]
+
+# tmux defaults that herdr binds elsewhere
+detach = ["prefix+q", "prefix+d"]
+split_vertical = ["prefix+v", "prefix+%"]          # tmux % split-window -h (side by side)
+split_horizontal = ["prefix+minus", "prefix+\""]   # tmux " split-window -v (stacked)
+rename_tab = ["prefix+shift+t", "prefix+comma"]   # tmux , rename-window
+close_tab = ["prefix+shift+x", "prefix+ampersand"] # tmux & kill-window
+
+[advanced]
+# tmux history-limit 10000 is lines; herdr counts bytes (the 10MB default is far more)
+# scrollback_limit_bytes = 10000000
+
+[ui]
+accent = "#00afff"
+
+# tmux: mouse on, wheel scrolls 5 lines, drag copies (copy_on_select defaults to true)
+mouse_capture = true
+mouse_scroll_lines = 5
+
+# tmux status bar sits at the bottom
+tab_bar_position = "bottom"
+# tmux status-right: ❬ %R ❬ %d %b  #h  [Z]
+tab_bar_right = [
+  { type = "datetime", format = "❬ %H:%M ❬ %d %b" },
+  { type = "hostname" },
+  { type = "zoom" },
+]
+
+# tmux set-titles-string: user@host | session:window.pane | cwd
+# (herdr has no user or cwd tokens)
+window_title = "{hostname} | {workspace}:{tab}.{pane}"

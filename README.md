@@ -39,6 +39,7 @@ first shell start; `antidote update` updates them. If a machine still has
 | `zsh`   | zsh startup files, prompt, plugin list |
 | `bash`  | bash fallback config (for machines/containers without zsh) |
 | `tmux`  | tmux config (prefix is `C-z`) plus Linux-specific bits |
+| `herdr` | [herdr](https://herdr.dev) config, ported from the tmux one (prefix is `C-z`) |
 | `spacemacs` | Spacemacs dotfile (`~/.spacemacs.d/init.el`) plus the org helpers it loads |
 
 ```sh
