@@ -55,6 +55,9 @@ trw() {
     fi
 }
 
+# Herdr: hermes runs as python3, so tell herdr which agent it is
+[ "${HERDR_ENV:-}" = 1 ] && alias hermes='HERDR_AGENT=hermes hermes'
+
 # Whats My IP
 alias wmi='dig +short myip.opendns.com @resolver1.opendns.com'
 
