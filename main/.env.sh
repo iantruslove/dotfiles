@@ -36,14 +36,14 @@ done
 unset p
 
 # PATH: all additions live here so bash and zsh agree. path_prepend skips
-# missing directories and ones already on PATH, so re-sourcing is harmless.
-# Later entries end up earlier in PATH.
+# missing directories and moves ones already on PATH to the front (macOS's
+# path_helper has already put them behind /usr/bin), so re-sourcing is
+# harmless. Later entries end up earlier in PATH.
 path_prepend() {
     [ -d "$1" ] || return 0
-    case ":$PATH:" in
-        *":$1:"*) ;;
-        *) PATH="$1:$PATH" ;;
-    esac
+    PATH=":$PATH:"
+    PATH="${PATH//:$1:/:}"
+    PATH="$1${PATH%:}"
 }
 if [[ "$OSTYPE" == darwin* ]]; then
     PNPM_HOME="$HOME/Library/pnpm"
