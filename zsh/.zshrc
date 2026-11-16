@@ -206,3 +206,6 @@ for f in ~/.site/*(N); do
     [[ -x "$f" ]] && source "$f"
 done
 unset f
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"

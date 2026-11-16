@@ -51,6 +51,7 @@ else
     PNPM_HOME="$HOME/.local/share/pnpm"
 fi
 [ -d "$PNPM_HOME" ] && export PNPM_HOME || unset PNPM_HOME
+[ -d "$HOME/.bun" ] && export BUN_INSTALL="$HOME/.bun"
 
 path_prepend /usr/local/sbin
 path_prepend /usr/local/bin
@@ -64,6 +65,7 @@ path_prepend "$HOME/.docker/bin"                    # Docker Desktop
 path_prepend "$HOME/.yarn/bin"
 path_prepend "$HOME/.cargo/bin"
 [ -n "$PNPM_HOME" ] && path_prepend "$PNPM_HOME"
+path_prepend "$HOME/.bun/bin"
 path_prepend "$HOME/.opencode/bin"
 path_prepend "$HOME/.local/bin"                     # uv, pipx, etc.
 path_prepend "$HOME/bin"
