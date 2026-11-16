@@ -10,3 +10,5 @@ main/.git_identities/
 .claude
 .serena
 .claude-sandbox
+# zsh completion cache (zstyle cache-path ~/.zsh/cache)
+zsh/.zsh/cache/
