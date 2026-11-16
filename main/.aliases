@@ -102,6 +102,7 @@ fi
 [ -x "$HOME/bin/gam7/gam" ] && alias gam="$HOME/bin/gam7/gam"
 
 alias nuc='mosh nuc'
+alias mini='mosh mini'
 
 nuctunnel() {
     if [ -z "$1" ]; then
