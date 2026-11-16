@@ -70,3 +70,9 @@ tab_bar_right = [
 # tmux set-titles-string: user@host | session:window.pane | cwd
 # (herdr has no user or cwd tokens)
 window_title = "{hostname} | {workspace}:{tab}.{pane}"
+
+# No "copied" pop-up after select-to-copy; it covers the bottom of the screen.
+# To keep it but move it instead: enabled = true, position = "top-right"
+# (top-left | top-right | bottom-left | bottom-center | bottom-right).
+[ui.toast.clipboard]
+enabled = false
