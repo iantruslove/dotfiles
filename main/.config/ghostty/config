@@ -1,0 +1,41 @@
+# Ghostty config, ported from ~/.wezterm.lua
+# Docs: ghostty +show-config --default --docs
+
+# wezterm: initial_cols = 140, initial_rows = 50
+window-width = 140
+window-height = 50
+
+# wezterm: font_size = 12
+font-size = 12
+
+# wezterm: color_scheme = 'Sequoia Moonlight'
+# Alternatives tried in wezterm (ghostty names):
+#   Selenized Dark, Modus Vivendi, Monokai Soda, Tomorrow Night Blue
+theme = Sequoia Moonlight Dark
+
+# wezterm: enable_tab_bar = false
+# Ghostty uses native macOS tabs, which only appear once a second tab is
+# opened, so there is nothing to disable here.
+
+# wezterm: window_frame 1px #444444 border
+# Ghostty has no window border option. The closest is the padding colour.
+window-padding-x = 1
+window-padding-y = 1
+window-padding-color = background
+
+# wezterm: enable_kitty_keyboard = true
+# Ghostty always supports the kitty keyboard protocol; no setting needed.
+
+# wezterm: shift-enter sends "\n" (fix for claude code)
+keybind = shift+enter=text:\n
+
+# wezterm: ctrl-backspace sends ESC DEL (fix for ssm emacs)
+keybind = ctrl+backspace=text:\x1b\x7f
+
+# wezterm: the 'update-right-status' hook that swaps colour scheme when the
+# pane title contains 'ian@nuc' has no equivalent. Ghostty has no scripting
+# hooks; the active theme was Sequoia Moonlight in both branches anyway.
+
+# Select-to-copy: selecting text copies it to the system clipboard.
+# (macOS default is none; "clipboard" is the only clipboard macOS has.)
+copy-on-select = clipboard
