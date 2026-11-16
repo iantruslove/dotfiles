@@ -59,12 +59,13 @@ if [ -n "$HOMEBREW_PREFIX" ]; then
     path_prepend "$HOMEBREW_PREFIX/bin"
     path_prepend "$HOMEBREW_PREFIX/opt/libpq/bin"   # psql, pg_dump
 fi
+path_prepend "$HOME/.lmstudio/bin"                  # lms
+path_prepend "$HOME/.docker/bin"                    # Docker Desktop
 path_prepend "$HOME/.yarn/bin"
 path_prepend "$HOME/.cargo/bin"
 [ -n "$PNPM_HOME" ] && path_prepend "$PNPM_HOME"
 path_prepend "$HOME/.opencode/bin"
 path_prepend "$HOME/.local/bin"                     # uv, pipx, etc.
-path_prepend "$HOME/.docker/bin"                     # uv, pipx, etc.
 path_prepend "$HOME/bin"
 export PATH
 
