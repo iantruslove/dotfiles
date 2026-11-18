@@ -70,6 +70,47 @@ function source_env
 }
 
 ################################################################################
+# sbx (Docker Sandboxes)
+
+# herdr only sees the host-side `sbx` process, not the agent inside the VM, so
+# sandboxed agents never show up in its agent list. Tell it which agent's
+# screen to read via HERDR_AGENT on the `sbx run` process. The agent is the
+# first matching positional, or, re-attaching with --name, the sandbox's own.
+function sbx
+{
+    if [[ "$1" != run || -z "$HERDR_ENV" || -n "$HERDR_AGENT" ]] ; then
+        command sbx "$@"
+        return
+    fi
+
+    local arg agent name prev
+    for arg in "${@:2}" ; do
+        [[ "$arg" == -- ]] && break
+        if [[ "$prev" == --name ]] ; then
+            name=$arg
+        else
+            case "$arg" in
+                --name=*) name=${arg#--name=} ;;
+                claude|codex|copilot|cursor|devin|droid|kiro|opencode)
+                    agent=${agent:-$arg} ;;
+            esac
+        fi
+        prev=$arg
+    done
+    if [[ -z "$agent" && -n "$name" ]] && command -v jq > /dev/null 2>&1 ; then
+        agent=$(command sbx ls --format json 2>/dev/null |
+                    jq -r --arg n "$name" '.[] | select(.name == $n) | .agent')
+    fi
+
+    case "$agent" in
+        claude|codex|copilot|cursor|devin|droid|kiro|opencode)
+            HERDR_AGENT=$agent command sbx "$@" ;;
+        *)
+            command sbx "$@" ;;
+    esac
+}
+
+################################################################################
 # Docker
 
 function docker_run_shell
