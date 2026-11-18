@@ -71,6 +71,11 @@ tab_bar_right = [
 # (herdr has no user or cwd tokens)
 window_title = "{hostname} | {workspace}:{tab}.{pane}"
 
+# Default agent rows, plus the sbx sandbox name ($sbx, reported by the sbx
+# wrapper in main/.functions; empty for agents not in a sandbox).
+[ui.sidebar.agents]
+rows = [["state_icon", "machine", "workspace", "tab"], ["agent", "$sbx"]]
+
 # No "copied" pop-up after select-to-copy; it covers the bottom of the screen.
 # To keep it but move it instead: enabled = true, position = "top-right"
 # (top-left | top-right | bottom-left | bottom-center | bottom-right).

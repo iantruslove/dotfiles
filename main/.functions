@@ -102,12 +102,22 @@ function sbx
                     jq -r --arg n "$name" '.[] | select(.name == $n) | .agent')
     fi
 
+    # Show the sandbox name in herdr's sidebar ($sbx token), or just "sbx"
+    # when sbx picks the name itself.
+    herdr pane report-metadata "$HERDR_PANE_ID" --source sbx \
+          --token sbx="${name:-sbx}" > /dev/null 2>&1
+
     case "$agent" in
         claude|codex|copilot|cursor|devin|droid|kiro|opencode)
             HERDR_AGENT=$agent command sbx "$@" ;;
         *)
             command sbx "$@" ;;
     esac
+    local ret=$?
+
+    herdr pane report-metadata "$HERDR_PANE_ID" --source sbx \
+          --clear-token sbx > /dev/null 2>&1
+    return $ret
 }
 
 ################################################################################
