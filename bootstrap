@@ -61,6 +61,15 @@ if have emacs && [ ! -e "$HOME/.emacs.d" ]; then
   echo "Installed Spacemacs; the first Emacs start installs its packages."
 fi
 
+# Ghostty only sets TERMINFO for its own children, so processes started
+# elsewhere (e.g. the Emacs daemon behind `emacsclient -t`) can't find
+# xterm-ghostty. Compile it into ~/.terminfo, which everything searches.
+GHOSTTY_TERMINFO=/Applications/Ghostty.app/Contents/Resources/terminfo
+if [ -d "$GHOSTTY_TERMINFO" ] && ! TERMINFO= infocmp -x xterm-ghostty >/dev/null 2>&1; then
+  TERMINFO=$GHOSTTY_TERMINFO infocmp -x xterm-ghostty | tic -x - 2>/dev/null
+  echo "Installed the xterm-ghostty terminfo entry into ~/.terminfo."
+fi
+
 echo
 echo "Done. Manual follow-ups (see README):"
 have zsh || echo "  - install zsh"
