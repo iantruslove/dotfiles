@@ -160,6 +160,10 @@ fi
 source ~/.antidote/antidote.zsh
 antidote load
 
+# zsh-syntax-highlighting draws comments as fg=black,bold, which is invisible
+# in themes whose black is the background colour (e.g. Sequoia Moonlight)
+ZSH_HIGHLIGHT_STYLES[comment]='fg=8'
+
 # Directory jumping (`z`), if zoxide is installed
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 
