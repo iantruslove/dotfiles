@@ -70,6 +70,27 @@ case "$tab" in
 esac || { printf '%s\n\npress enter to close' "$out"; read -r _; }
 '''
 
+# Move the focused pane to another tab in this workspace (or a new one),
+# picked with fzf. Same approach as prefix+M above.
+[[keys.command]]
+key = "prefix+m"
+type = "popup"
+width = 60
+height = 15
+command = '''
+PATH=/opt/homebrew/bin:$PATH
+h="$HERDR_BIN_PATH"
+tab=$( { "$h" tab list --workspace "$HERDR_ACTIVE_WORKSPACE_ID" | jq -r --arg cur "$HERDR_ACTIVE_TAB_ID" \
+           '.result.tabs[] | select(.tab_id != $cur) | "\(.tab_id)\t\(.number): \(.label)"'
+         printf 'new\t+ new tab\n'; } \
+       | fzf --with-nth=2.. --delimiter='\t' --prompt='move pane to> ' | cut -f1)
+case "$tab" in
+  "") exit 0 ;;
+  new) out=$("$h" pane move "$HERDR_ACTIVE_PANE_ID" --new-tab --workspace "$HERDR_ACTIVE_WORKSPACE_ID" 2>&1) ;;
+  *) out=$("$h" pane move "$HERDR_ACTIVE_PANE_ID" --tab "$tab" --split right 2>&1) ;;
+esac || { printf '%s\n\npress enter to close' "$out"; read -r _; }
+'''
+
 [advanced]
 # tmux history-limit 10000 is lines; herdr counts bytes (the 10MB default is far more)
 # scrollback_limit_bytes = 10000000
