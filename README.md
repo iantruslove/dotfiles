@@ -13,8 +13,9 @@ curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstr
 (With wget: `wget -qO- <url> | sh`.) The same setup is used on every machine.
 
 `bootstrap` installs git and stow (brew, apt, dnf, pacman or pkg), clones this
-repo to `~/.dotfiles` over HTTPS (pushes go over SSH), runs `install`, and
-installs [tpm](https://github.com/tmux-plugins/tpm). Any existing files that
+repo to `~/.dotfiles` over HTTPS (pushes go over SSH), then runs `sync`, which
+stows the packages, installs [tpm](https://github.com/tmux-plugins/tpm) (and
+Spacemacs if emacs is present), and lists any manual follow-ups. Any existing files that
 would be replaced, such as a distro's default `~/.bashrc`, are moved to
 `~/.dotfiles-backup/<timestamp>/`.
 
@@ -107,6 +108,12 @@ and choose one per repo with `git identity github`.
 ## Updating
 
 ```sh
-git -C ~/.dotfiles pull && ~/.dotfiles/install
-update   # OS + package updates: softwareupdate/brew bundle on macOS, apt/dnf/pacman on Linux
+~/.dotfiles/sync   # pull, restow, prune stale links, install extras, list follow-ups
+update             # OS + package updates: softwareupdate/brew bundle on macOS, apt/dnf/pacman on Linux
 ```
+
+`sync` is safe to re-run. It pulls with `--ff-only` (so it stops if you have
+local commits or a diverged branch), shows the commits it pulled, restows every
+package, and removes dangling symlinks into the repo left behind by files or
+packages that have since been deleted. On a machine whose clone predates
+`sync`, run `git -C ~/.dotfiles pull` once first, or just re-run `bootstrap`.

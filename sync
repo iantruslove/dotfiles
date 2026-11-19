@@ -1,0 +1,87 @@
+#!/bin/sh
+# Bring an existing ~/.dotfiles install up to date with the repo.
+#
+#   ~/.dotfiles/sync             # pull, restow, install extras, report follow-ups
+#   ~/.dotfiles/sync --no-pull   # same, without pulling (bootstrap uses this)
+#
+# Safe to run repeatedly. Assumes git and stow are installed (bootstrap does that).
+set -e
+
+DOTFILES=$(cd "$(dirname "$0")" && pwd)
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# 1. Pull, then re-exec so the rest of the run uses the new version of this script.
+if [ "${1:-}" != "--no-pull" ]; then
+  before=$(git -C "$DOTFILES" rev-parse HEAD)
+  if ! git -C "$DOTFILES" pull --quiet --ff-only; then
+    echo "sync: 'git pull --ff-only' failed in $DOTFILES; resolve that and re-run." >&2
+    exit 1
+  fi
+  after=$(git -C "$DOTFILES" rev-parse HEAD)
+  if [ "$before" != "$after" ]; then
+    echo "Pulled:"
+    git -C "$DOTFILES" log --oneline "$before..$after" | sed 's/^/  /'
+  else
+    echo "Already up to date."
+  fi
+  exec "$DOTFILES/sync" --no-pull
+fi
+
+# 2. Restow every package (backs up conflicting files).
+"$DOTFILES/install" || status=$?
+
+# 3. Remove dangling symlinks into the repo, left behind by files or whole
+#    packages that have since been deleted from it. Only dotfile dirs and
+#    ~/bin are searched, which is everywhere stow puts links.
+find "$HOME" -maxdepth 4 \
+  \( -path "$DOTFILES" -o -path "$HOME/.cache" -o -path "$HOME/.emacs.d" \
+     -o -path "$HOME/.tmux/plugins" -o -name node_modules -o -name .git \
+     -o \( -type d -path "$HOME/[!.]*" ! -path "$HOME/bin" \) \) -prune \
+  -o -type l -lname "*$(basename "$DOTFILES")/*" ! -exec test -e {} \; -print 2>/dev/null |
+while IFS= read -r link; do
+  rm "$link"
+  echo "Removed stale link ~/${link#"$HOME"/}"
+done
+
+# 4. Things the configs expect but don't install themselves.
+if have tmux && [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+  git clone --quiet https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+  echo "Installed tpm; press <prefix> I inside tmux to install plugins."
+fi
+
+if have emacs && [ ! -e "$HOME/.emacs.d" ]; then
+  git clone --quiet --depth 1 https://github.com/syl20bnr/spacemacs "$HOME/.emacs.d"
+  echo "Installed Spacemacs; the first Emacs start installs its packages."
+fi
+
+# Ghostty only sets TERMINFO for its own children, so processes started
+# elsewhere (e.g. the Emacs daemon behind `emacsclient -t`) can't find
+# xterm-ghostty. Compile it into ~/.terminfo, which everything searches.
+GHOSTTY_TERMINFO=/Applications/Ghostty.app/Contents/Resources/terminfo
+if [ -d "$GHOSTTY_TERMINFO" ] && ! TERMINFO='' infocmp -x xterm-ghostty >/dev/null 2>&1; then
+  TERMINFO=$GHOSTTY_TERMINFO infocmp -x xterm-ghostty | tic -x - 2>/dev/null
+  echo "Installed the xterm-ghostty terminfo entry into ~/.terminfo."
+fi
+
+# 5. Manual follow-ups.
+todo=$(
+  have zsh || echo "  - install zsh"
+  case "$SHELL" in */zsh) ;; *) echo "  - chsh -s \"\$(command -v zsh)\"" ;; esac
+  [ -f "$HOME/.git_identities/.gitconfig" ] || \
+    echo "  - create ~/.git_identities/.gitconfig (git refuses to commit without an identity)"
+  [ -d "$HOME/.zplug" ] && echo "  - rm -rf ~/.zplug (replaced by antidote)"
+  for tool in fzf zoxide herdr; do
+    have "$tool" || echo "  - optional: install $tool"
+  done
+)
+
+echo
+if [ -n "$todo" ]; then
+  echo "Done. Manual follow-ups (see README):"
+  echo "$todo"
+else
+  echo "Done."
+fi
+
+exit "${status:-0}"

@@ -3,7 +3,8 @@
 #
 #   curl -fsSL https://raw.githubusercontent.com/iantruslove/dotfiles/master/bootstrap | sh
 #
-# Installs git and stow, clones (or updates) ~/.dotfiles, and stows packages.
+# Installs git and stow, clones (or updates) ~/.dotfiles, then runs ./sync.
+# On a machine that already has ~/.dotfiles, just run ~/.dotfiles/sync.
 set -e
 
 REPO_HTTPS=https://github.com/iantruslove/dotfiles.git
@@ -47,35 +48,5 @@ else
   git -C "$DOTFILES" remote set-url --push origin "$REPO_SSH"
 fi
 
-# 3. Stow packages
-"$DOTFILES/install"
-
-# 4. Things the configs expect but don't install themselves
-if have tmux && [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-  git clone --quiet https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-  echo "Installed tpm; press <prefix> I inside tmux to install plugins."
-fi
-
-if have emacs && [ ! -e "$HOME/.emacs.d" ]; then
-  git clone --quiet --depth 1 https://github.com/syl20bnr/spacemacs "$HOME/.emacs.d"
-  echo "Installed Spacemacs; the first Emacs start installs its packages."
-fi
-
-# Ghostty only sets TERMINFO for its own children, so processes started
-# elsewhere (e.g. the Emacs daemon behind `emacsclient -t`) can't find
-# xterm-ghostty. Compile it into ~/.terminfo, which everything searches.
-GHOSTTY_TERMINFO=/Applications/Ghostty.app/Contents/Resources/terminfo
-if [ -d "$GHOSTTY_TERMINFO" ] && ! TERMINFO= infocmp -x xterm-ghostty >/dev/null 2>&1; then
-  TERMINFO=$GHOSTTY_TERMINFO infocmp -x xterm-ghostty | tic -x - 2>/dev/null
-  echo "Installed the xterm-ghostty terminfo entry into ~/.terminfo."
-fi
-
-echo
-echo "Done. Manual follow-ups (see README):"
-have zsh || echo "  - install zsh"
-case "$SHELL" in */zsh) ;; *) echo "  - chsh -s \"\$(command -v zsh)\"" ;; esac
-[ -f "$HOME/.git_identities/.gitconfig" ] || \
-  echo "  - create ~/.git_identities/.gitconfig (git refuses to commit without an identity)"
-for tool in fzf zoxide herdr; do
-  have "$tool" || echo "  - optional: install $tool"
-done
+# 3. Stow packages, install extras, list manual follow-ups
+exec "$DOTFILES/sync" --no-pull
