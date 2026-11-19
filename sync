@@ -67,7 +67,7 @@ fi
 # 5. Manual follow-ups.
 todo=$(
   have zsh || echo "  - install zsh"
-  case "$SHELL" in */zsh) ;; *) echo "  - chsh -s \"\$(command -v zsh)\"" ;; esac
+  [ "${SHELL##*/}" = zsh ] || echo "  - chsh -s \"\$(command -v zsh)\""
   [ -f "$HOME/.git_identities/.gitconfig" ] || \
     echo "  - create ~/.git_identities/.gitconfig (git refuses to commit without an identity)"
   [ -d "$HOME/.zplug" ] && echo "  - rm -rf ~/.zplug (replaced by antidote)"
